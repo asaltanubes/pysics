@@ -1,0 +1,194 @@
+from pysics.objetos import Medida, Recta
+import numpy as np
+
+def minimos_cuadrados(x: Medida, y: Medida, aproximar = False) -> tuple[Medida, Medida]:
+    """
+    Calcula la recta de ajuste por mínimos cuadrados para dos medidas.
+
+    return tuple(Medida, Medida)
+    (pen, n_0)
+    pen: pendiente de la recta de ajuste
+    n_0: ordenada en el origen de la recta de ajuste
+    """
+    p, n = calc_line(x.medida, y.medida)
+    dp, dn = sigma_calc_line(x.medida, y.medida)
+    pen: Medida = Medida(p, dp, aproximar=aproximar)
+    n_0: Medida = Medida(n, dn, aproximar=aproximar)
+    return Recta(pen, n_0)
+
+def minimos_pesados(x: Medida, y: Medida, aproximar = False) -> tuple[Medida, Medida]:
+    """
+    Calcula la recta de ajuste por mínimos cuadrados pesados para dos medidas.
+    El error del eje y se extrae de la Medida \"y\" y el error del eje x se
+    desprecia
+
+    return tuple(Medida, Medida)
+    (pen, n_0)
+    pen: pendiente de la recta de ajuste
+    n_0: ordenada en el origen de la recta de ajuste
+    """
+    p, n = wcalc_line(x.medida, y.medida, y.error)
+    dp, dn = wsigma_calc_line(x.medida, y.medida, y.error)
+    pen: Medida = Medida(p, dp, aproximar=aproximar)
+    n_0: Medida = Medida(n, dn, aproximar=aproximar)
+    return Recta(pen, n_0)
+
+def line(x: Medida, pen, n_0=0):
+    if isinstance(x, Medida):
+        x = np.array(x.medida)
+
+    if isinstance(pen, Recta):
+        n_0 = pen.n_0
+        pen = pen.pendiente
+
+    if isinstance(pen, Medida):
+        pen = np.array(pen.medida)
+    if isinstance(n_0, Medida):
+        n_0 = np.array(n_0.medida)
+
+    return x*pen + n_0
+
+def compativility(a, da, b, db, nameA = 'A', nameB = 'B'):
+    maxA = a+da
+    maxB = b+db
+    minA = a-da
+    minB = b-db
+    if (maxA >= b and minA <= b) and (maxB >= a and minB <= a):
+        return f'{nameA} en {nameB} y {nameB} en {nameA}'
+    if (maxA >= b and minA <= b) and not (maxB >= a and minB <= a):
+        return f'{nameB} en {nameA} pero no {nameA} en {nameB}'
+    if not(maxA >= b and minA <= b) and  (maxB >= a and minB <= a):
+        return f'{nameA} en {nameB} pero no {nameB} en {nameA}'
+    if (minA < maxB and a>b):
+        return f'{nameA} y {nameB} tienen un rango compatible: [{minA}, {maxB}]'
+    if (minB < maxA and b>a):
+        return f'{nameA} y {nameB} tienen un rango compatible: [{minB}, {maxA}]'
+    return f'{nameA} y {nameB} no son compatibles'
+
+def calc_line(x, y):
+    """Dadas 2 listas con los valores x e y de un conjunto de puntos devuelve el ajuste por mínimos cuadrados de esta"""
+    return pen(x, y), n_0(x, y)
+
+def sigma_calc_line(x, y):
+    """Dadas 2 listas con los valores x e y de un conjunto de puntos devuelve los errores de la pendiente y la ordenada en el origen"""
+    return sigma_pen(x, y), sigma_n_0(x, y)
+
+def pen(x : np.array, y : np.array):
+    """Calcula la pendiente de la recta de ajuste"""
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+
+    return float((x.size*np.sum(x*y) - np.sum(x)*np.sum(y))/(x.size*np.sum(x**2) - np.sum(x)**2))
+
+def n_0 (x : np.array, y : np.array):
+    """Calcula la ordenada en el origen de la recta de ajuste"""
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+
+    return float((np.sum(y)*np.sum(x**2) - np.sum(x)*np.sum(x*y))/(x.size * np.sum(x**2) - (np.sum(x))**2))
+
+def sigma_y(x : np.array, y : np.array):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+
+    ŷ = line(x=x, pen=pen(x, y), n_0=n_0(x, y))
+    return float(np.sqrt( (np.sum( (y-ŷ)**2 ) ) / (x.size - 2)))
+
+def sigma_pen(x, y):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+
+    return float(sigma_y(x, y) *np.sqrt( x.size / (x.size * np.sum(x**2) - np.sum(x)**2) ))
+
+def sigma_n_0(x, y):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+    return float(sigma_y(x, y) * np.sqrt( np.sum(x**2) / (x.size * np.sum(x**2) - np.sum(x)**2) ))
+
+
+def wcalc_line(x, y, yerr):
+    return wpen(x, y, yerr), wn_0(x, y, yerr)
+
+def wsigma_calc_line(x, y, yerr):
+    return wsigma_pen(x, y, yerr), wsigma_n_0(x, y, yerr)
+
+
+def wpen(x, y, yerr = None):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        if yerr == None:
+            yerr = y.error
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+    yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
+
+    w = 1/yerr**2
+
+    return float((np.sum(w)*np.sum(w*x*y) - np.sum(w*x)*np.sum(w*y)) / (np.sum(w) * np.sum(w*x**2) - np.sum(w*x)**2))
+
+def wn_0(x, y, yerr = None):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        if yerr == None:
+            yerr = y.error
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+    yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
+
+    w = 1/yerr**2
+
+    return float(( np.sum(w*y) * np.sum(w*x**2) - np.sum(w*x) * np.sum(w*x*y)) / (np.sum(w) * np.sum(w * x**2) - np.sum(w*x)**2))
+
+def wsigma_pen(x, y, yerr = None):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        if yerr == None:
+            yerr = y.error
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+    yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
+
+    w = 1/yerr**2
+
+    return float(np.sqrt(np.sum(w) / ( np.sum(w) * np.sum(w*x**2) - np.sum(w*x)**2 ) ))
+
+def wsigma_n_0(x, y, yerr = None):
+    if isinstance(x, Medida):
+        x = x.medida
+    if isinstance(y, Medida):
+        if yerr == None:
+            yerr = y.error
+        y = y.medida
+    x = x if type(x) == type(np.array) else np.array(x)
+    y = y if type(y) == type(np.array) else np.array(y)
+    yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
+
+    w = 1/yerr**2
+
+    return float(np.sqrt( np.sum(w*x**2) / (np.sum(w) * np.sum(w*x**2) - np.sum(w*x)**2) ))
