@@ -6,7 +6,7 @@ from math import nan
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
     (en una lista) y sus respectivos errores"""
-    def __init__(self, medida: (list[float], float), error: (list[float], float) = 0, aproximar = True):
+    def __init__(self, medida: list[float] or float, error: list[float] or float = 0, aproximar: bool = True):
         if not isinstance(medida, Medida):
             if not isinstance(medida, np.ndarray):
                 if not hasattr(medida, '__iter__'):
@@ -33,22 +33,6 @@ class Medida:
             self.aprox()
         self.__print_style = self.Estilo.pm
 
-    # def medida():
-    #     doc = "The medida property."
-    #     def fget(self):
-    #         return self._medida
-    #     def fset(self, value):
-    #         if not isinstance(value, np.ndarray):
-    #             print(value)
-    #             if not hasattr(value, '__iter__'):
-    #                 value = [value]
-    #             value = np.array(value)
-    #         self._medida = value
-    #     def fdel(self):
-    #         del self._medida
-    #     return locals()
-    # medida = property(**medida())
-
     def datos():
         doc = "The medida property. Pero permite ser usado solo con listas para el usuario"
         def fget(self):
@@ -59,21 +43,6 @@ class Medida:
             del self._medida
         return locals()
     datos = property(**datos())
-    #
-    # def error():
-    #     doc = "The error property."
-    #     def fget(self):
-    #         return self._error
-    #     def fset(self, value):
-    #         if not isinstance(value, np.ndarray):
-    #             if not hasattr(value, '__iter__'):
-    #                 value = [value]
-    #             value = np.array(value)
-    #         self._medida = value
-    #     def fdel(self):
-    #         del self._error
-    #     return locals()
-    # error = property(**error())
 
     def unpack(self) -> tuple[list[float], list[float]]:
         """Devuelve una tupla con la(s) medida(s) y su(s) error(es)"""

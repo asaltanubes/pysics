@@ -2,7 +2,7 @@ import numpy as np
 from pysics.objetos import Medida
 
 
-def rad(med):
+def rad(med: Medida) -> Medida:
     """Transforma un ángulo a radianes"""
     if not isinstance(med, Medida):
         return med * np.pi/180
@@ -10,7 +10,7 @@ def rad(med):
     error = np.pi/180 * med.error
     return Medida(valores, error, aproximar = False)
 
-def sen(x):
+def sen(x: Medida) -> Medida:
     if not isinstance(x, Medida):
         return np.sin(x)
     valor = np.sin(x.medida)
@@ -30,7 +30,7 @@ def cos(x: Medida) -> Medida:
     error = abs(np.sin(x.medida))*x.error
     return Medida(valor, error, aproximar = False)
 
-def log(x):
+def log(x: Medida) -> Medida:
     """Logaritmo natural"""
     if not isinstance(x, Medida):
         return np.log(x)
@@ -38,7 +38,7 @@ def log(x):
     error = abs(1/x.medida)*x.error
     return Medida(valor, error, aproximar = False)
 
-def sqrt(x):
+def sqrt(x: Medida) -> Medida:
     if isinstance(x, Medida):
         x = x.copy()
     return x**(1/2)

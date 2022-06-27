@@ -1,8 +1,8 @@
 from matplotlib import pyplot as plt
-from pysics.ajuste import line as ajuste_linea
-from pysics.objetos import Medida
-
-def hollow_scatter(x, y, dotcolor = 'tab:red', marker = 'o', s = 50, label = None, zorder = 100, **kargs):
+from .ajuste import line as ajuste_linea
+from .objetos import Medida, Recta
+from .type_alias import elementos
+def hollow_scatter(x: elementos, y: elementos, dotcolor: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
         x = x.medida
     if isinstance(y, Medida):
@@ -10,7 +10,7 @@ def hollow_scatter(x, y, dotcolor = 'tab:red', marker = 'o', s = 50, label = Non
     plt.scatter(x, y, s=s, marker = marker, facecolors = 'none', edgecolors = dotcolor, label=label, zorder = zorder, **kargs)
 
 
-def plot(x, y, label=None, **kargs):
+def plot(x: elementos, y: elementos, label=None, **kargs):
     if isinstance(x, Medida):
         x = x.medida
     if isinstance(y, Medida):
@@ -18,7 +18,7 @@ def plot(x, y, label=None, **kargs):
     plt.plot(x, y, label = label, **kargs)
 
 
-def scatter(x, y, c = 'tab:blue', s = 50, label=None, **kargs):
+def scatter(x: elementos, y: elementos, c = 'tab:blue', s = 50, label=None, **kargs):
     if isinstance(x, Medida):
         x = x.medida
     if isinstance(y, Medida):
@@ -26,7 +26,7 @@ def scatter(x, y, c = 'tab:blue', s = 50, label=None, **kargs):
     plt.scatter(x, y, s=s, facecolors = 'none', edgecolors = c, label=label, **kargs)
 
 
-def hollow_errorbar(x, y, yerr = None, xerr = None, dotcolor = 'tab:red', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
+def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:red', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):
         if xerr == None:
             xerr = x.error
@@ -39,7 +39,7 @@ def hollow_errorbar(x, y, yerr = None, xerr = None, dotcolor = 'tab:red', marker
     plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
 
 
-def errorbar(x, y, yerr, xerr = None, dotcolor = 'tab:blue'):
+def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue'):
     if isinstance(x, Medida):
         x = x.medida
     if isinstance(y, Medida):
@@ -47,9 +47,12 @@ def errorbar(x, y, yerr, xerr = None, dotcolor = 'tab:blue'):
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = 'tab:red', fmt = 'o', color = dotcolor, zorder = 0)
 
 
-def line(x, pen, n_0=0, c = 'tab:blue', label=None, **kargs):
+def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', label=None, **kargs):
     if isinstance(x, Medida):
         x = x.medida
+    if isinstance(pen, Recta):
+        n_0 = pen.n_0
+        pen = pen.pendiente
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
 def anotar(texto: str = '', xy: tuple[float, float] = (0,0), xytext: tuple[float, float]=(0, 0), fontsize = 10, arrowprops = {'arrowstyle': '->'},**kargs):
@@ -103,7 +106,7 @@ def guardar(lugar: str = None, sobrescribir = True, dpi = 'figure', formato=None
             from __main__ import __file__ as nombre
             nombre = nombre.split('\\')[-1]
             nombre = nombre.split('.')[0] + '.PDF'
-        except (AttributeError, ImportError):
+        except AttributeError:
             nombre = 'figura.PDF'
         lugar = nombre.replace('_', ' ')
 
