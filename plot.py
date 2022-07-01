@@ -4,52 +4,52 @@ from .objetos import Medida, Recta
 from .type_alias import elementos
 def hollow_scatter(x: elementos, y: elementos, dotcolor: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     plt.scatter(x, y, s=s, marker = marker, facecolors = 'none', edgecolors = dotcolor, label=label, zorder = zorder, **kargs)
 
 
 def plot(x: elementos, y: elementos, label=None, **kargs):
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     plt.plot(x, y, label = label, **kargs)
 
 
 def scatter(x: elementos, y: elementos, c = 'tab:blue', s = 50, label=None, **kargs):
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     plt.scatter(x, y, s=s, facecolors = 'none', edgecolors = c, label=label, **kargs)
 
 
 def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:red', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):
         if xerr == None:
-            xerr = x.error
-        x = x.medida
+            xerr = x._error
+        x = x._medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y.error
-        y = y.medida
+            yerr = y._error
+        y = y._medida
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', label=label, zorder = barzorder)
     plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
 
 
 def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue'):
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = 'tab:red', fmt = 'o', color = dotcolor, zorder = 0)
 
 
 def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', label=None, **kargs):
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(pen, Recta):
         n_0 = pen.n_0
         pen = pen.pendiente

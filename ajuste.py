@@ -36,16 +36,16 @@ def minimos_pesados(x: Medida, y: Medida, yerr: Opcional[[float, ...]] = None, a
 
 def line(x: elementos , pen: float, n_0: float=0) -> list[float]:
     if isinstance(x, Medida):
-        x = np.array(x.medida)
+        x = x._medida
 
     if isinstance(pen, Recta):
         n_0 = pen.n_0
         pen = pen.pendiente
 
     if isinstance(pen, Medida):
-        pen = np.array(pen.medida)
+        pen = pen._medida
     if isinstance(n_0, Medida):
-        n_0 = np.array(n_0.medida)
+        n_0 = n_0._medida
 
     return x*pen + n_0
 
@@ -60,9 +60,9 @@ def sigma_calc_line(x: float, y: float) -> tuple[float, float]:
 def pen(x : elementos, y : elementos) -> float:
     """Calcula la pendiente de la recta de ajuste"""
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
 
@@ -71,9 +71,9 @@ def pen(x : elementos, y : elementos) -> float:
 def n_0 (x : elementos, y : elementos) -> float:
     """Calcula la ordenada en el origen de la recta de ajuste"""
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
 
@@ -81,9 +81,9 @@ def n_0 (x : elementos, y : elementos) -> float:
 
 def sigma_y(x : elementos, y : elementos) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
 
@@ -92,9 +92,9 @@ def sigma_y(x : elementos, y : elementos) -> float:
 
 def sigma_pen(x: elementos, y: elementos) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
 
@@ -102,9 +102,9 @@ def sigma_pen(x: elementos, y: elementos) -> float:
 
 def sigma_n_0(x: elementos, y: elementos) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
-        y = y.medida
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     return float(sigma_y(x, y) * np.sqrt( np.sum(x**2) / (x.size * np.sum(x**2) - np.sum(x)**2) ))
@@ -117,11 +117,11 @@ def wsigma_calc_line(x: elementos, y: elementos, yerr: Opcional[[float, ...]]) -
 
 def wpen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y.error
-        y = y.medida
+            yerr = y._error
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
@@ -132,11 +132,11 @@ def wpen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> flo
 
 def wn_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y.error
-        y = y.medida
+            yerr = y._error
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
@@ -147,11 +147,11 @@ def wn_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> flo
 
 def wsigma_pen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y.error
-        y = y.medida
+            yerr = y._error
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
@@ -162,11 +162,11 @@ def wsigma_pen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) 
 
 def wsigma_n_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
     if isinstance(x, Medida):
-        x = x.medida
+        x = x._medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y.error
-        y = y.medida
+            yerr = y._error
+        y = y._medida
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     yerr = yerr if type(yerr) == type(np.array) else yerr * np.ones(x.size)
