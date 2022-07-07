@@ -1,4 +1,3 @@
-from zmq import has
 from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
@@ -185,6 +184,8 @@ class Medida:
 
 
 class Recta:
+    '''Objeto que representa una recta, contiene dos medidas, una para la ordenada en el origen y otra para la
+    pendiente de la recta. Pueden obtenerse desestructurandola al igual que una tupla (pendiente, n_0)'''
     def __init__(self, pendiente=0, n_0=0, x=[]):
         self.pendiente = Medida(pendiente, aproximar = False)
         self.n_0 = Medida(n_0, aproximar = False)
