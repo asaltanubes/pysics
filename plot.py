@@ -2,12 +2,13 @@ from matplotlib import pyplot as plt
 from .ajuste import line as ajuste_linea
 from .objetos import Medida, Recta
 from .type_alias import elementos
-def hollow_scatter(x: elementos, y: elementos, dotcolor: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
+
+def scatter(x: elementos, y: elementos, c: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
         y = y._medida
-    plt.scatter(x, y, s=s, marker = marker, facecolors = 'none', edgecolors = dotcolor, label=label, zorder = zorder, **kargs)
+    plt.scatter(x, y, s=s, marker = marker, facecolors = 'none', edgecolors = c, label=label, zorder = zorder, **kargs)
 
 
 def plot(x: elementos, y: elementos, label=None, **kargs):
@@ -16,14 +17,6 @@ def plot(x: elementos, y: elementos, label=None, **kargs):
     if isinstance(y, Medida):
         y = y._medida
     plt.plot(x, y, label = label, **kargs)
-
-
-def scatter(x: elementos, y: elementos, c = 'tab:blue', s = 50, label=None, **kargs):
-    if isinstance(x, Medida):
-        x = x._medida
-    if isinstance(y, Medida):
-        y = y._medida
-    plt.scatter(x, y, s=s, facecolors = 'none', edgecolors = c, label=label, **kargs)
 
 
 def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:red', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
@@ -39,12 +32,12 @@ def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcol
     plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
 
 
-def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue'):
+def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue', errorbarcolor = 'tab:red', **kargs):
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
         y = y._medida
-    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = 'tab:red', fmt = 'o', color = dotcolor, zorder = 0)
+    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'o', color = dotcolor, zorder = 0, **kargs)
 
 
 def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', label=None, **kargs):
@@ -55,13 +48,13 @@ def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', lab
         pen = pen.pendiente
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
+
 def anotar(texto: str = '', xy: tuple[float, float] = (0,0), xytext: tuple[float, float]=(0, 0), fontsize = 10, arrowprops = {'arrowstyle': '->'},**kargs):
     plt.annotate(texto, xy=xy, xytext=xytext, fontsize=fontsize, arrowprops = arrowprops,**kargs)
 
 
 def xlabel(text, fontsize = 12, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
-
 
 def ylabel(text, fontsize = 12, **kargs):
     plt.ylabel(text, fontsize = fontsize, **kargs)
