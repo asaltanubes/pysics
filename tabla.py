@@ -21,9 +21,11 @@ def create_table_list(lista: list, cabecera=None, transponer=False) -> list[list
     return lista
 
 def terminal(datos: list, cabecera: Opcional[list] = None, transponer: bool = False) -> str:
+    """Devuelve una cadena de texto que representa una tabla que se puede mostrar por la terminal"""
     return tabulate(create_table_list(datos, cabecera, transponer), tablefmt='grid')
 
 def latex(datos: list, cabecera: Opcional[list] = None, caption: str = 'Caption', label: str = 'tab:my_label', transponer: bool = False) -> str:
+    """Devuelve una cadena de texto que representa una tabla de latex"""
     tabular = '\n'.join(tabulate(create_table_list(datos, cabecera, transponer), tablefmt='latex').replace(r'\\', '\\\\ \n \\hline').split('\n')[1:-2])
     ancho = len(tabular.split('\\hline')[1].split('&'))
     tabular = f'\\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + r'\end{tabular}'

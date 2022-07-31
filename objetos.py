@@ -82,7 +82,9 @@ class Medida:
             raise TypeError(f'El estilo {estilo} no es un estilo válido')
 
     class Estilo:
+        """Clase conteninendo las diferentes funciones que representan la clase medida"""
         def lista(self):
+            """[medidas] ± [errores]"""
             if len(self._medida) == 1:
                 m = self._medida[0]
                 e = self._error[0]
@@ -92,12 +94,14 @@ class Medida:
             return f'{m} ± {e}'
 
         def pm(self):
+            """medida 1 ± error 1, medida2 ± error 2, ..."""
             l = []
             for m, e in zip(self._medida, self._error):
                 l.append(f'{m} ± {e}')
             return ', '.join(l)
 
         def tabla(self):
+            """Igual que pm pero solo funciona con una medida de longitud 1 por razones de debug"""
             if len(self._medida) == 1:
                 m = self._medida[0]
                 e = self._error[0]
@@ -200,6 +204,7 @@ class Recta:
         return Recta(self.pendiente.copy(), self.n_0.copy())
 
     def corte(self, other):
+        """Punto de corte con otra recta"""
         if not isinstance(other, Recta):
             other = Recta(0, other)
         delta_p = self.pendiente - other.pendiente

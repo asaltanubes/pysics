@@ -2,6 +2,7 @@ import numpy as np
 # from VACIO import NULL
 from math import log10, trunc, floor, isnan, isinf, nan
 from .type_alias import elementos
+
 def aprox(valor: list[float] or float, error: list[float] or float) -> tuple[float, float] or tuple[list[float], list[float]]:
     # Si error no es un objeto iterable entonces se aplica la versión que no itera. Si es iterable entonces aplica la version que itera
     if not hasattr(valor, '__iter__'):
