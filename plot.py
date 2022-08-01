@@ -91,18 +91,8 @@ def tight_layout():
 def tamaño(left=.1, right = .9, bottom=.1, top=.9, **kargs):
     plt.subplots_adjust(left=left, right=right, bottom=bottom, top=top, **kargs)
 
-def guardar(lugar: str = None, sobrescribir = True, dpi = 'figure', formato=None, auto_size = True, **kargs):
+def guardar(lugar: str = 'figura', formato='PDF', dpi = 'figure', auto_size = True, **kargs):
     if auto_size: tamaño()
-    if lugar == None:
-        # Si no se proporciona nombre se empleará el del archivo ejecutado
-        try:
-            from __main__ import __file__ as nombre
-            nombre = nombre.split('\\')[-1]
-            nombre = nombre.split('.')[0] + '.PDF'
-        except AttributeError:
-            nombre = 'figura.PDF'
-        lugar = nombre.replace('_', ' ')
-
     plt.savefig(lugar, dpi=dpi, format = formato, **kargs)
 
 def show(auto_size = True):

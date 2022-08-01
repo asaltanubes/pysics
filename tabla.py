@@ -1,6 +1,7 @@
 from .objetos import Medida
 from tabulate import tabulate
 from .type_alias import Opcional
+
 def transpose(lista: list) -> list:
     return list(zip(*lista))
 
