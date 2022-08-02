@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from os.path import exists
 from .ajuste import line as ajuste_linea
 from .objetos import Medida, Recta
 from .type_alias import elementos
@@ -91,9 +92,16 @@ def tight_layout():
 def tamaño(left=.1, right = .9, bottom=.1, top=.9, **kargs):
     plt.subplots_adjust(left=left, right=right, bottom=bottom, top=top, **kargs)
 
-def guardar(lugar: str = 'figura', formato='PDF', dpi = 'figure', auto_size = True, **kargs):
+def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'figure', auto_size = True, **kargs):
+    if not sobrescribir:
+        if exists(f'{lugar}.{formato}'):
+            i = 0
+            while exists(f'{lugar}({i}).{formato}'):
+                i += 1
+            lugar = lugar + f'({i})'
+    
     if auto_size: tamaño()
-    plt.savefig(lugar, dpi=dpi, format = formato, **kargs)
+    plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
 def show(auto_size = True):
     if auto_size: tamaño()
