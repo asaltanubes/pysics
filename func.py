@@ -39,6 +39,15 @@ def log(x: Medida) -> Medida:
     return Medida(valor, error, aproximar = False)
 
 def sqrt(x: Medida) -> Medida:
+    """Raiz cuadrada"""
     if isinstance(x, Medida):
         x = x.copy()
     return x**(1/2)
+
+def exp(x: Medida) -> Medida:
+    """Función exponencial (e**x)"""
+    if not isinstance(x, Medida):
+        return np.exp(x)
+    valor = np.exp(x._medida)
+    error = abs(valor)*x._error
+    return Medida(valor, error, aproximar=False)
