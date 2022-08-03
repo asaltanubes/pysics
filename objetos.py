@@ -168,6 +168,11 @@ class Medida:
     def __or__(self, other):
         return self & -other
 
+    def __eq__(self, other):
+        if not isinstance(other, Medida):
+            raise TypeError(f"Unsuported operand type(s) for ==: Medida and {type(other)}")
+        return self.media == other.medida and self.error == other.error
+        
     def __len__(self):
         return len(self._medida)
 
