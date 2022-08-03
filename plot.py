@@ -50,7 +50,10 @@ def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', lab
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
 
-def anotar(texto: str = '', xy: tuple[float, float] = (0,0), xytext: tuple[float, float]=(0, 0), fontsize = 10, arrowprops = {'arrowstyle': '->'},**kargs):
+def text(texto: str = '', x: float = 0, y: float = 0, fontsize = 10, **kargs):
+    plt.text(x, y, texto, fontsize=fontsize, **kargs)
+
+def anotar(texto: str = '', xy: tuple[float, float] = (0,0), xytext: tuple[float, float]=(0,0), fontsize = 10, arrowprops = {'arrowstyle': '->'},**kargs):
     plt.annotate(texto, xy=xy, xytext=xytext, fontsize=fontsize, arrowprops = arrowprops,**kargs)
 
 
