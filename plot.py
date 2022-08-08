@@ -17,6 +17,8 @@ def plot(x: elementos, y: elementos, label=None, **kargs):
         x = x._medida
     if isinstance(y, Medida):
         y = y._medida
+    if isinstance(y, Recta):
+        y = ajuste_linea(x, y)
     plt.plot(x, y, label = label, **kargs)
 
 
