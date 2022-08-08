@@ -35,12 +35,10 @@ class Medida:
         self.__print_style = self.Estilo.pm
 
     @classmethod
-    def from_pairs(*args, error = None, aproximar=False) -> self:
-        if error == None:
-            if not all([len(i) == 2 for i in args]):
-                raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
-            return Medida([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
-        return Medida(args, error, aproximar=aproximar)
+    def from_pairs(*args, aproximar=False) -> self:
+        if not all([len(i) == 2 for i in args]):
+            raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
+        return Medida([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
 
     @property
     def medida(self):
