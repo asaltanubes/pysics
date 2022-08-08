@@ -1,3 +1,4 @@
+from aprox import apr
 from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
@@ -32,6 +33,14 @@ class Medida:
         if aproximar:
             self.aprox()
         self.__print_style = self.Estilo.pm
+
+    @classmethod
+    def from_pairs(*args, error = None, aproximar=False) -> self:
+        if error == None:
+            if not all([len(i) == 2 for i in args]):
+                raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
+            return Medida([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
+        return Medida(args, error, aproximar=aproximar)
 
     @property
     def medida(self):
