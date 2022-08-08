@@ -15,7 +15,7 @@ def minimos_cuadrados(x: elementos, y: elementos, aproximar: bool = False) -> Re
     dp, dn = sigma_calc_line(x, y)
     pen: Medida = Medida(p, dp, aproximar=aproximar)
     n_0: Medida = Medida(n, dn, aproximar=aproximar)
-    return Recta(pen, n_0)
+    return Recta(pen, n_0, x.medida)
 
 def minimos_pesados(x: Medida, y: Medida, yerr: Opcional[[float, ...]] = None, aproximar: bool = False) -> Recta:
     """
@@ -32,7 +32,7 @@ def minimos_pesados(x: Medida, y: Medida, yerr: Opcional[[float, ...]] = None, a
     dp, dn = wsigma_calc_line(x=x, y=y, yerr=yerr)
     pen: Medida = Medida(p, dp, aproximar=aproximar)
     n_0: Medida = Medida(n, dn, aproximar=aproximar)
-    return Recta(pen, n_0)
+    return Recta(pen, n_0, x.medida)
 
 def line(x: elementos , pen: float, n_0: float=0) -> list[float]:
     if isinstance(x, Medida):

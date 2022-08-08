@@ -1,6 +1,7 @@
 from aprox import apr
 from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
+from pysics.plot import line as plot_line
 import numpy as np
 from math import nan
 
@@ -205,7 +206,10 @@ class Recta:
     def __init__(self, pendiente=0, n_0=0, x=[]):
         self.pendiente = Medida(pendiente, aproximar = False)
         self.n_0 = Medida(n_0, aproximar = False)
-        self.x = Medida(x)
+        if not isinstance(x, Medida):
+            self.x = Medida(x)
+        else:
+            self.x = x
 
     def aprox(self):
         self.pendiente.aprox()
@@ -226,6 +230,10 @@ class Recta:
         x = delta_n/delta_p
         y = self.pendiente * x + self.n_0
         return (x, y)
+
+    def plot(self) -> self:
+        plot_line(self.x, self.pen, self.n_0)
+        return self
 
     def __iter__(self):
         return (i for i in (self.pendiente, self.n_0))
