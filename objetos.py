@@ -1,8 +1,5 @@
-from typing_extensions import Self
-from aprox import apr
 from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
-from pysics.plot import line as plot_line
 import numpy as np
 from math import nan
 
@@ -37,7 +34,7 @@ class Medida:
         self.__print_style = self.Estilo.pm
 
     @classmethod
-    def from_pairs(*args, aproximar=False) -> Self:
+    def from_pairs(*args, aproximar=False):
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
         return Medida([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
@@ -232,8 +229,9 @@ class Recta:
         y = self.pendiente * x + self.n_0
         return (x, y)
 
-    def plot(self) -> Self:
-        plot_line(self.x, self.pen, self.n_0)
+    def plot(self, c = 'tab:blue', label=None, **kargs):
+        from .plot import line as plot_line
+        plot_line(self, c=c, label=label, **kargs)
         return self
 
     def __iter__(self):
