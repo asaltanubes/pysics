@@ -43,12 +43,16 @@ def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'o', color = dotcolor, zorder = 0, **kargs)
 
 
-def line(x: elementos, pen: Medida or float or Recta, n_0=0, c = 'tab:blue', label=None, **kargs):
+def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', label=None, **kargs):
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(pen, Recta):
         n_0 = pen.n_0
         pen = pen.pendiente
+    if isinstance(x, Recta):
+        pen = x.pendiente
+        n_0 = x.n_0
+        x = x.x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
 
