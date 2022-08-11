@@ -62,7 +62,9 @@ e = (a+b).aprox() # 15.662 ± 0.02
 f = (c*d).aprox() # 1.21 ± 0.16, 4.8 ± 0.5, 10.9 ± 1.0
 ```
 En este caso puede apreciarse los posibles problemas de la aritmética de punto flotante. Por lo general la aproximación al usar un error borra.
-Estos errores por la gran diferencia de orden de magnitud pero es algo a tener en cuenta si se usan medidas muy precisas.
+Estos errores por la gran diferencia de orden de magnitud pero es algo a tener en cuenta si se usan medidas muy precisas. (Nota: La mayoría de calculadoras científicas tienen
+una precisión menor que los calculos resultantes de python por lo que cualquier otro método para calcular que no sea a mano es probable que introduzca errores de este tipo que son
+despreciables ej: las calculadoras científicas blancas de casio utilizan 15 digitos de precisión)
 ```python
 g = a+c # 8.931000000000001 ± 0.10097524449091472, 10.031 ± 0.10097524449091472, 11.131 ± 0.10097524449091472
 
