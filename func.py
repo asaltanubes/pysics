@@ -16,8 +16,6 @@ def sen(x: Medida) -> Medida:
         return np.sin(x)
     
     valor = np.sin(x._medida)
-    if 1 in valor:
-        raise RuntimeWarning("Uno de los valores tiene un error de 0, sin embargo esto puede ser poco preciso")
 
     error = abs(np.cos(x._medida))*x._error
     return Medida(valor, error, aproximar = False)
@@ -27,8 +25,6 @@ def cos(x: Medida) -> Medida:
         return np.sin(x)
     
     valor = np.cos(x._medida)
-    if 1 in valor:
-        raise RuntimeWarning("Uno de los valores tiene un error de 0, sin embargo esto puede ser poco preciso")
 
     error = abs(np.sin(x._medida))*x._error
     return Medida(valor, error, aproximar = False)
