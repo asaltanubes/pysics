@@ -2,6 +2,8 @@ from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
 from math import nan
+import decimal
+import calculos
 
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
@@ -10,23 +12,22 @@ class Medida:
         if not isinstance(medida, Medida):
             if not isinstance(medida, np.ndarray):
                 if not hasattr(medida, '__iter__'):
-                    medida = np.array([medida])
+                    medida = [medida]
                 else:
-                    medida = np.array(medida)
+                    medida = medida
             if not isinstance(error, np.ndarray):
                 if not hasattr(error, '__iter__'):
-                    error = np.array([error]*len(medida))
+                    error = [error]*len(medida)
                 else:
-                    if len(medida) == len(error):
-                        error = np.array(error)
-                    else:
+                    if not len(medida) == len(error):
                         if len(error) > 1 or error == []:
                             raise ValueError(
                             "No hay el mismo número de medidas que de errores o no es el mismo error para todas las medidas")
                         error = np.array(error * len(medida))
-            self._medida: np.ndarray[float] = medida
-            self._error: np.ndarray[float] = error
+            self._medida = np.array([Number(i) for i in medida])
+            self._error  = np.array([Number(i) for i in error])
         else:
+            medida = medida.copy()
             self._medida = medida._medida
             self._error = medida._error
         if aproximar:
@@ -45,7 +46,7 @@ class Medida:
     
     @property
     def error(self):
-        return list(self.error)
+        return list(self._error)
 
     def unpack(self) -> tuple[list[float], list[float]]:
         """Devuelve una tupla con la(s) medida(s) y su(s) error(es)"""
@@ -91,26 +92,26 @@ class Medida:
         """Clase conteninendo las diferentes funciones que representan la clase medida"""
         def lista(self):
             """[medidas] ± [errores]"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
-                e = self._error[0]
+            if len(self.medida) == 1:
+                m = self.medida[0]
+                e = self.error[0]
             else:
-                m = self._medida
-                e = self._error
+                m = [str(i) for i in self.medida]
+                e = [str(i) for i in self.error]
             return f'{m} ± {e}'
 
         def pm(self):
             """medida 1 ± error 1, medida2 ± error 2, ..."""
             l = []
-            for m, e in zip(self._medida, self._error):
+            for m, e in zip(self.medida, self.error):
                 l.append(f'{m} ± {e}')
             return ', '.join(l)
 
         def tabla(self):
             """Igual que pm pero solo funciona con una medida de longitud 1 por razones de debug"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
-                e = self._error[0]
+            if len(self.medida) == 1:
+                m = self.medida[0]
+                e = self.error[0]
                 if e == 0:
                     return str(m)
                 return f'{m} ± {e}'
@@ -242,6 +243,133 @@ class Recta:
 
     def __repr__(self):
         return f'Recta( {self} )'
+    
+class Number:
+    def __init__(self, value):
+        if isinstance(value, Number):
+            self.value = value.value
+        elif isinstance(value, (int, float)):
+            value = str(value)
+            self.value = decimal.Decimal(value)
+        elif isinstance(value, str):
+            self.value = decimal.Decimal(value)
+        elif isinstance(value, decimal.Decimal):
+            self.value = value
+        elif type(value).__module__ == np.__name__:
+            value = float(value)
+            self.value = decimal.Decimal(str(value))
+        else: raise TypeError(f"Value not suported :{type(value)}")
+    
+    def sqrt(self):
+        return Number(self.value.sqrt())
+    
+    def exp(self):
+        return Number(self.value.exp())
+    
+    def log10(self):
+        return Number(self.value.log10())
+
+    def log(self):
+        return Number(self.value.ln())
+    
+    def sin(self):
+        decimal.getcontext().prec += 2
+        i, lasts, s, fact, num, sign = 1, 0, self.value, 1, self.value, 1
+        while s != lasts:
+            lasts = s
+            i += 2
+            fact *= i * (i-1)
+            num *= self.value * self.value
+            sign *= -1
+            s += num / fact * sign
+        decimal.getcontext().prec -= 2
+        return Number(+s)
+
+    def cos(self):
+        decimal.getcontext().prec += 2
+        i, lasts, s, fact, num, sign = 0, 0, 1, 1, 1, 1
+        while s != lasts:
+            lasts = s
+            i += 2
+            fact *= i * (i-1)
+            num *= self.value * self.value
+            sign *= -1
+            s += num / fact * sign
+        decimal.getcontext().prec -= 2
+        return Number(+s)
+
+    def tan(self):
+        return self.sin()/self.cos()
+    
+    def __int__(self):
+        return int(self.value)
+
+    def __float__(self):
+        return float(self.value)
+
+    def __add__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(self.value + other.value)
+    __radd__ = __add__
+    
+    def __sub__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(self.value - other.value)
+    def __rsub__(self, other): 
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(other.value - self.value)
+    
+    def __mul__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(self.value * other.value)
+    __rmul__ = __mul__
+    
+    def __truediv__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(self.value / other.value)
+    def __rtruediv__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(other.value / self.value)
+    
+    def __pow__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        if isinstance(other, (int, float)):
+            other = Number(other)
+        return Number(self.value**other.value)
+    def __rpow__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(other.value ** self.value)
+    
+    def __eq__(self, other):
+        if not isinstance(other, (Number, int, float)):
+            raise TypeError(f"Unsuported operand type(s) for ==: Number and {type(other)}")
+        if isinstance(other, (int, float)):
+            other = Number(other)
+        return self.value == other.value
+        
+    def __neg__(self):
+        return (-1)*self
+    
+    def __abs__(self):
+        return Number(self.value.copy_abs())
+    
+    def __round__(self, ndigits=0):
+        return Number(round(self.value, ndigits))
+    
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return repr(self.value)
+
 
 if __name__ == '__main__':
     # pass

@@ -1,5 +1,4 @@
-from .objetos import Medida
-from .objetos import Recta
+from .objetos import Medida, Recta, Number
 from .cargador import cargar
 
 from . import ajuste
@@ -10,3 +9,4 @@ from . import func
 from . import objetos
 from . import plot
 from . import tabla
+from . import calculos

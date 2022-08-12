@@ -61,13 +61,8 @@ y ninguna tiene un unico elemento, ej: Medida([1, 2]) + Medida([1, 2, 3]), se la
 e = (a+b).aprox() # 15.662 ± 0.02
 f = (c*d).aprox() # 1.21 ± 0.16, 4.8 ± 0.5, 10.9 ± 1.0
 ```
-En este caso puede apreciarse los posibles problemas de la aritmética de punto flotante. Por lo general la aproximación al usar un error borra.
-Estos errores por la gran diferencia de orden de magnitud pero es algo a tener en cuenta si se usan medidas muy precisas. (Nota: La mayoría de calculadoras científicas tienen
-una precisión menor que los calculos resultantes de python por lo que cualquier otro método para calcular que no sea a mano es probable que introduzca errores de este tipo que son
-despreciables ej: las calculadoras científicas blancas de casio utilizan 15 digitos de precisión)
+Si dos medidas son dependientes y quieren sumarse o restarse se deben usar los operadores & y |
 ```python
-g = a+c # 8.931000000000001 ± 0.10097524449091472, 10.031 ± 0.10097524449091472, 11.131 ± 0.10097524449091472
-
 # Para realizar sumas de medidas dependientes se usa el operador &
 h = (a&b).aprox() # 15.66 ± 0.03
 # Para realizar restas de medidas dependientes se usa el operador |
@@ -82,11 +77,10 @@ j = c.copy().aprox()
 j = c.aprox()
 ```
 
-Para recoger los valores de las medidas o errores en una lista se pueden usar las propiedades medida y error. (NOTA, estos valores solo pueden ser leidos. Cualquier modificación
-no se transmite al valores de la medida)
+Para recoger los valores de las medidas o errores en una lista se pueden usar las propiedades medida y error.
 ```python
-print(d.medida) # [1.1, 2.2, 3.3]
-print(d.error) # [0.1, 0.2, 0.3]
+print(d.medida) # [Number(1.1), Number(2.2), Number(3.3)]
+print(d.error)  # [Number(0.1), Number(0.2), Number(0.3)]
 medida, error = d.unpack()
 ```
 Para calcular la media, desviación estandar y error estandar de una medida pueden usarse los métodos del mismo nombre
