@@ -1,4 +1,3 @@
-## pysics
 # pysics
 Pysics es un módulo escrito en python para realizar los cálculos que suelen realizarse en laboratorios de física. 
 Este se basa en el uso de la clase ""Medida"" la cual permite guardar mediciones con error y realizar la aproximación estandar
