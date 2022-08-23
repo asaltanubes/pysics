@@ -3,7 +3,6 @@ from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
 from math import nan
 import decimal
-import calculos
 
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
