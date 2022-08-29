@@ -59,12 +59,15 @@ def text(texto: str = '', x: float = 0, y: float = 0, fontsize = 10, **kargs):
 
 def anotar(texto: str = '', xy = (0,0), xytext =(0,0), fontsize = 10, arrowstyle='->', arco = 0,**kargs):
     arrowprops = dict(arrowstyle=arrowstyle, connectionstyle=f"arc3, rad ={arco}")
-    if hasattr(xy[0], '__len__'):
+    if isinstance(xy[0], (list, tuple)):
         for point in xy[1:]:   
             plt.annotate(texto, xy=point, xytext=xytext, fontsize=fontsize, arrowprops = arrowprops, color=(0, 0, 0, 0),**kargs)
         xy = xy[0]
     plt.annotate(texto, xy=xy, xytext=xytext, fontsize=fontsize, arrowprops = arrowprops,**kargs)
 
+def flecha(xy0 = (0,0), xy1=(0,0), arco=0):
+    arrowprops = dict(arrowstyle='->', connectionstyle=f"arc3, rad ={arco}")
+    plt.annotate('', xy1, xy0, arrowprops=arrowprops)
 
 def xlabel(text, fontsize = 12, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
