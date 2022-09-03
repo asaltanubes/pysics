@@ -115,9 +115,9 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
                 i += 1
             lugar = lugar + f'({i})'
     
-    if auto_size: tamaño()
+    if auto_size: tight_layout()
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
 def show(auto_size = True):
-    if auto_size: tamaño()
+    if auto_size: tight_layout()
     plt.show()
