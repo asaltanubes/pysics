@@ -15,5 +15,5 @@ def set_precision(prec):
     decimal.getcontext().prec   = prec
     decimal.DefaultContext.prec = prec
 
-def get_precision(prec):
-    decimal.getcontext().prec = prec
+def get_precision():
+    return decimal.getcontext().prec
