@@ -3,6 +3,7 @@ from tkinter import ROUND
 from typing import Type
 
 decimal.DefaultContext.prec = 60
+decimal.getcontext().prec   = 60
 
 ROUND_UP = decimal.ROUND_HALF_UP
 ROUND_DOWN = decimal.ROUND_HALF_DOWN
