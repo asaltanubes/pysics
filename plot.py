@@ -3,6 +3,7 @@ from os.path import exists
 from .ajuste import line as ajuste_linea
 from .objetos import Medida, Recta
 from .type_alias import elementos
+from numpy import linspace
 
 def scatter(x: elementos, y: elementos, c: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
@@ -33,6 +34,12 @@ def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', l
         x = x.x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
+def funcion(funcion, x, coeficientes, label = None, **kargs):
+    if isinstance(coeficientes, Medida):
+        coeficientes = coeficientes.medida
+    x = linspace(min(x), max(x))
+    y = [funcion(i, *coeficientes) for i in x]
+    plot(x, y, label, **kargs)
 
 def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):

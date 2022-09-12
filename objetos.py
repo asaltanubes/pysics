@@ -193,9 +193,11 @@ class Medida:
     def __str__(self):
         return self.__print_style(self)
 
-
     def __repr__(self):
         return "Medida( " + str(self) + " )"
+    
+    def __iter__(self):
+        return (Medida(valor, error, aproximar=False) for valor, error in zip(self._medida, self._error))
 
 
 class Recta:

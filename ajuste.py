@@ -1,6 +1,20 @@
 from .objetos import Medida, Recta
 from .type_alias import elementos, Opcional
 import numpy as np
+from scipy.optimize import curve_fit
+
+
+
+
+def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list[float] = None, aproximar: bool = False):
+    if isinstance(x, Medida):
+        x = x._medida
+    if isinstance(y, Medida):
+        if sigma is not None:
+            sigma = y._error
+        y = y._medida
+    popt, error = curve_fit(funcion, x, y, p0=initial_guess) if sigma is None else curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
+    return Medida(popt, np.sqrt(np.diag(error)), aproximar=aproximar)
 
 def minimos_cuadrados(x: elementos, y: elementos, aproximar: bool = False) -> Recta:
     """
