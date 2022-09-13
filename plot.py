@@ -34,9 +34,12 @@ def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', l
         x = x.x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
-def funcion(funcion, x, coeficientes, label = None, **kargs):
+def funcion(x, funcion, coeficientes, label = None, **kargs):
     if isinstance(coeficientes, Medida):
         coeficientes = coeficientes.medida
+    if hasattr(coeficientes, '__iter__'):
+        if isinstance(coeficientes[0], Medida):
+            coeficientes = [i.medida[0] for i in coeficientes]
     x = linspace(min(x), max(x))
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)

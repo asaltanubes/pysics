@@ -197,7 +197,7 @@ class Medida:
         return "Medida( " + str(self) + " )"
     
     def __iter__(self):
-        return (Medida(valor, error, aproximar=False) for valor, error in zip(self._medida, self._error))
+        return (float(i) for i in self.medida)
 
 
 class Recta:
@@ -356,6 +356,31 @@ class Number:
             other = Number(other)
         return self.value == other.value
         
+    def __lt__(self, other):
+        if isinstance(other, Number):
+            other = other.value
+        return self.value < other
+    
+    def __gt__(self, other):
+        if isinstance(other, Number):
+            other = other.value
+        return self.value > other
+    
+    def __le__(self, other):
+        if isinstance(other, Number):
+            other = other.value
+        return self.value <= other
+    
+    def __ge__(self, other):
+        if isinstance(other, Number):
+            other = other.value
+        return self.value >= other
+    
+    def __ne__(self, other):
+        if isinstance(other, Number):
+            other = other.value
+        return self.value != other
+    
     def __neg__(self):
         return (-1)*self
     

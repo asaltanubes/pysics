@@ -14,7 +14,7 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
             sigma = y._error
         y = y._medida
     popt, error = curve_fit(funcion, x, y, p0=initial_guess) if sigma is None else curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
-    return Medida(popt, np.sqrt(np.diag(error)), aproximar=aproximar)
+    return tuple((Medida(v, e, aproximar=aproximar) for v, e in zip(popt, np.sqrt(np.diag(error)))))
 
 def minimos_cuadrados(x: elementos, y: elementos, aproximar: bool = False) -> Recta:
     """
