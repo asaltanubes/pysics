@@ -47,12 +47,12 @@ def funcion(x, funcion, coeficientes, label = None, **kargs):
 def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):
         if xerr == None:
-            xerr = x._error
-        x = x._medida
+            xerr = x.error
+        x = x.medida
     if isinstance(y, Medida):
         if yerr == None:
-            yerr = y._error
-        y = y._medida
+            yerr = y.error
+        y = y.medida
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', label=label, zorder = barzorder)
     plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
 

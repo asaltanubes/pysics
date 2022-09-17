@@ -41,11 +41,11 @@ class Medida:
 
     @property
     def medida(self):
-        return list(self._medida)
+        return [float(i) for i in self._medida]
     
     @property
     def error(self):
-        return list(self._error)
+        return [float(i) for i in self._error]
 
     def unpack(self) -> tuple[list[float], list[float]]:
         """Devuelve una tupla con la(s) medida(s) y su(s) error(es)"""
