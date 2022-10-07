@@ -4,6 +4,11 @@ from .ajuste import line as ajuste_linea
 from .objetos import Medida, Recta
 from .type_alias import elementos
 from numpy import linspace
+import locale
+locale.setlocale(locale.LC_ALL, '')
+
+usar_notacion_cientifica = True
+rango_sin_notacion_cientifica = (-2, 2)
 
 def scatter(x: elementos, y: elementos, c: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
@@ -117,17 +122,32 @@ def tight_layout():
 def tamaño(left=.1, right = .9, bottom=.1, top=.9, **kargs):
     plt.subplots_adjust(left=left, right=right, bottom=bottom, top=top, **kargs)
 
-def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'figure', auto_size = True, **kargs):
+def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'figure', auto_size = True, auto_tick_format = True, **kargs):
     if not sobrescribir:
         if exists(f'{lugar}.{formato}'):
             i = 0
             while exists(f'{lugar}({i}).{formato}'):
                 i += 1
             lugar = lugar + f'({i})'
-    
+    if auto_tick_format: tick_format()
     if auto_size: tight_layout()
+    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
-def show(auto_size = True):
+def show(auto_size = True, auto_tick_format = True,):
+    if auto_tick_format: tick_format()
     if auto_size: tight_layout()
+    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
     plt.show()
+
+def tick_format(locale = True, useMathText=True, style = '', scilimits = None, **kargs):
+    plt.ticklabel_format(useLocale=locale, style=style, scilimits=scilimits, useMathText=useMathText, **kargs)
+
+def set_notacion_cientifica(usar=usar_notacion_cientifica, rango=rango_sin_notacion_cientifica):
+    usar_notacion_cientifica = usar
+    rango_sin_notacion_cientifica = rango
+
+
+def notacion_cientifica(usar=True, rango = (0, 0)):
+    style = 'sci' if usar else 'plain'
+    plt.ticklabel_format(style=style, scilimits=rango)
