@@ -13,6 +13,8 @@ def create_table_list(lista: list, cabecera=None, transponer=False) -> list[list
         else:
             a.append(element)
     lista = a
+    max_len = max([len(i) for i in lista])
+    lista = [i + ['']*(max_len - len(i) if len(i) < max_len else 0) for i in lista]
     if cabecera is not None:
         if len(cabecera) < len(lista):
             cabecera = cabecera + ['']*(len(lista)-len(cabecera))
