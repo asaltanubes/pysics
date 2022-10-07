@@ -6,7 +6,6 @@ from .type_alias import elementos
 from numpy import linspace
 import locale
 locale.setlocale(locale.LC_ALL, '')
-
 usar_notacion_cientifica = True
 rango_sin_notacion_cientifica = (-2, 2)
 
@@ -134,7 +133,7 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
     notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
-def show(auto_size = True, auto_tick_format = True,):
+def show(auto_size = True, auto_tick_format = True):
     if auto_tick_format: tick_format()
     if auto_size: tight_layout()
     notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
@@ -147,7 +146,9 @@ def set_notacion_cientifica(usar=usar_notacion_cientifica, rango=rango_sin_notac
     usar_notacion_cientifica = usar
     rango_sin_notacion_cientifica = rango
 
-
 def notacion_cientifica(usar=True, rango = (0, 0)):
     style = 'sci' if usar else 'plain'
     plt.ticklabel_format(style=style, scilimits=rango)
+    
+def use_latex(usar=True):
+    if usar: plt.rcParams.update({"text.usetex": usar})
