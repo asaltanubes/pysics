@@ -13,6 +13,11 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
         if sigma is not None:
             sigma = y._error
         y = y._medida
+    
+    if initial_guess is not None and not hasattr(initial_guess, '__iter__'):
+        from inspect import signature
+        if len(signature(funcion).parameters) == 2:
+            initial_guess = (initial_guess, )
     popt, error = curve_fit(funcion, x, y, p0=initial_guess) if sigma is None else curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
     return tuple((Medida(v, e, aproximar=aproximar) for v, e in zip(popt, np.sqrt(np.diag(error)))))
 
