@@ -64,12 +64,16 @@ def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcol
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', label=label, zorder = barzorder)
     plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
 
-def errorbar(x: elementos, y: elementos, yerr, xerr = None, dotcolor = 'tab:blue', errorbarcolor = 'tab:red', **kargs):
+def errorbar(x: elementos, y: elementos, yerr=None, xerr = None, errorbarcolor = 'tab:red', **kargs):
     if isinstance(x, Medida):
-        x = x._medida
+        if xerr == None:
+            xerr = x.error
+        x = x.medida
     if isinstance(y, Medida):
-        y = y._medida
-    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'o', color = dotcolor, zorder = 0, **kargs)
+        if yerr == None:
+            yerr = y.error
+        y = y.medida
+    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', zorder = 0, **kargs)
 
 
 def text(texto: str = '', x: float = 0, y: float = 0, fontsize = 10, **kargs):
