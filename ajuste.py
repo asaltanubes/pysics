@@ -11,7 +11,7 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
         x = x._medida
     if isinstance(y, Medida):
         if sigma is not None:
-            sigma = y._error
+            sigma = y.error
         y = y._medida
     
     if initial_guess is not None and not hasattr(initial_guess, '__iter__'):
