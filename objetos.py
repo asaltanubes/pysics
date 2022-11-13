@@ -78,7 +78,7 @@ class Medida:
 
     def estimacion(self):
         """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
-        return Medida(self.media()* (1+0*self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
+        return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
 
     def cambia_estilo(self, estilo):
         if estilo in self.Estilo.__dict__.values():
