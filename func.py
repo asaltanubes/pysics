@@ -64,4 +64,4 @@ def delta(x: Medida) -> Medida:
         v = i-j
         valores.append(v._medida[0])
         errores.append(v._error[0])
-    return Medida(valores, errores)
+    return Medida(valores, errores, aproximar=False)
