@@ -80,6 +80,9 @@ class Medida:
         """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
         return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
 
+    def iter_medida(self):
+        return (Medida(i, j, aproximar=False) for i,j in zip(self._medida, self._error))
+
     def cambia_estilo(self, estilo):
         if estilo in self.Estilo.__dict__.values():
             self.__print_style = estilo
@@ -183,9 +186,7 @@ class Medida:
         return len(self._medida)
 
     def __getitem__(self, index):
-        if index >= len(self):
-            raise IndexError("Indice fuera de rango")
-        return Medida(self._medida[index], self._error[index])
+        return Medida(self._medida[index], self._error[index], aproximar=False)
 
     def __neg__(self):
         return (-1)*self.copy()

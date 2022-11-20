@@ -2,13 +2,13 @@ import numpy as np
 from pysics.objetos import Medida
 
 
-def rad(med: Medida) -> Medida:
+def rad(grados: Medida) -> Medida:
     """Transforma un ángulo a radianes"""
-    if not isinstance(med, Medida):
-        return med * np.pi/180
+    if not isinstance(grados, Medida):
+        return grados * np.pi/180
     
-    valores = med._medida*np.pi/180
-    error = np.pi/180 * med._error
+    valores = grados._medida*np.pi/180
+    error = np.pi/180 * grados._error
     return Medida(valores, error, aproximar = False)
 
 def sen(x: Medida) -> Medida:
@@ -22,7 +22,7 @@ def sen(x: Medida) -> Medida:
 
 def cos(x: Medida) -> Medida:
     if not isinstance(x, Medida):
-        return np.sin(x)
+        return np.cos(x)
     
     valor = np.cos(x._medida)
 
@@ -52,3 +52,16 @@ def exp(x: Medida) -> Medida:
     valor = np.exp(x._medida)
     error = abs(valor)*x._error
     return Medida(valor, error, aproximar=False)
+
+def delta(x: Medida) -> Medida:
+    """Devuelve x[n+1]-x[n] en una medida"""
+    if not isinstance(x, Medida):
+        x = Medida(x)
+
+    valores = []
+    errores = []
+    for i, j in zip(x[1:].iter_medida(), x[:-1].iter_medida()):
+        v = i-j
+        valores.append(v._medida[0])
+        errores.append(v._error[0])
+    return Medida(valores, errores)
