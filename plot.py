@@ -97,6 +97,10 @@ def xlabel(text, fontsize = 12, **kargs):
 def ylabel(text, fontsize = 12, **kargs):
     plt.ylabel(text, fontsize = fontsize, **kargs)
 
+def ticks(fontsize = 14, **kargs):
+    plt.xticks(fontsize=fontsize, **kargs)
+    plt.yticks(fontsize=fontsize, **kargs)
+
 def xticks(fontsize=14, **kargs):
     plt.xticks(fontsize=fontsize, **kargs)
 
