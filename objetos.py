@@ -4,37 +4,53 @@ import numpy as np
 from math import nan
 import decimal
 
+
+
+def _tratar_error(medida, error):
+    '''
+    Convierte un error pasado a una medida en un error que la medida puede manejar
+    El tipo debe ser np.ndarray[Number]. Si se pasa un solo valor a la función se
+    toma como un error constante para toda la medida'''
+    
+    if hasattr(error, '__iter__'):
+        if not len(medida) == len(error):
+            if len(error) != 1:
+                raise ValueError(
+                "No hay el mismo número de medidas que de errores o no es un error constante")
+            error = (error * len(medida))
+    else:
+                error = [error]*len(medida)
+    return np.array([Number(i) for i in error])
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
     (en una lista) y sus respectivos errores"""
-    def __init__(self, medida: list[float] or float, error: list[float] or float = 0, aproximar: bool = True):
+    def __init__(self, medida: list[float] or float, error: list[float] or float = None, aproximar: bool = True):
         if not isinstance(medida, Medida):
-            if not isinstance(medida, np.ndarray):
-                if not hasattr(medida, '__iter__'):
-                    medida = [medida]
-                else:
-                    medida = medida
-            if not isinstance(error, np.ndarray):
-                if not hasattr(error, '__iter__'):
-                    error = [error]*len(medida)
-                else:
-                    if not len(medida) == len(error):
-                        if len(error) > 1 or error == []:
-                            raise ValueError(
-                            "No hay el mismo número de medidas que de errores o no es el mismo error para todas las medidas")
-                        error = np.array(error * len(medida))
+            error = 0 if error is None else error
+            # Si no se pasa un iterable se convierte en uno
+            if not hasattr(medida, '__iter__'):
+                medida = [medida]
+            
             self._medida = np.array([Number(i) for i in medida])
-            self._error  = np.array([Number(i) for i in error])
+            self._error  = _tratar_error(medida, error)
         else:
             medida = medida.copy()
             self._medida = medida._medida
-            self._error = medida._error
+            if error is None:
+                self._error = medida._error
+            else:
+                self._error = _tratar_error(medida._medida, error)
+                
+                
         if aproximar:
             self.aprox()
         self.__print_style = self.Estilo.pm
 
     @classmethod
     def from_pairs(*args, aproximar=False):
+        '''
+            Dado un grupo de parejas de valores con sus errores devuelve la medida correspondiente
+        '''
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
         return Medida([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
@@ -52,6 +68,7 @@ class Medida:
         return list(self._medida), list(self._error)
 
     def lista_de_medidas(self):
+        """Devuelve una lista con los valores contenidos como medidas individuales"""
         return [Medida(*i, aproximar=False) for i in zip(self._medida, self._error)]
 
     def copy(self):
@@ -79,9 +96,6 @@ class Medida:
     def estimacion(self):
         """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
         return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
-
-    def iter_medida(self):
-        return (Medida(i, j, aproximar=False) for i,j in zip(self._medida, self._error))
 
     def cambia_estilo(self, estilo):
         if estilo in self.Estilo.__dict__.values():

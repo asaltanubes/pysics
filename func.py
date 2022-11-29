@@ -60,7 +60,7 @@ def delta(x: Medida) -> Medida:
 
     valores = []
     errores = []
-    for i, j in zip(x[1:].iter_medida(), x[:-1].iter_medida()):
+    for i, j in zip(x[1:].lista_de_medidas(), x[:-1].lista_de_medidas()):
         v = i-j
         valores.append(v._medida[0])
         errores.append(v._error[0])
