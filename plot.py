@@ -39,8 +39,13 @@ def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', l
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
 def curva(funcion, x, coeficientes, label = None, **kargs):
+    # Coeficientes puede ser una medida o un iterable de medidas
+    # En el primero cada coeficiente es el valor de cada medida.
+    # En el segundo cada coeficiente es el primer valor de la medida
+    # Si solo hay un coeficiente se toma como coeficiente singular
     if isinstance(coeficientes, Medida):
         coeficientes = coeficientes.medida
+        
     if hasattr(coeficientes, '__iter__'):
         if isinstance(coeficientes[0], Medida):
             coeficientes = [i.medida[0] for i in coeficientes]
@@ -48,6 +53,7 @@ def curva(funcion, x, coeficientes, label = None, **kargs):
         from inspect import signature
         if len(signature(funcion).parameters) == 2:
             coeficientes = (coeficientes, )
+            
     x = linspace(min(x), max(x))
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)

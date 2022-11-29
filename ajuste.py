@@ -2,23 +2,33 @@ from .objetos import Medida, Recta
 from .type_alias import elementos, Opcional
 import numpy as np
 from scipy.optimize import curve_fit
-
+from inspect import signature
 
 
 
 def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list[float] = None, aproximar: bool = False):
+    '''Hace un ajuste a una curva arbitraria dada por la funcion pasada como parametro.
+    Si no se pasa parametro para sigma el ajuste no tiene pesos, si se pasa un iterable se toman como erroes
+    los valores en el iterable. En otro caso se toman los valores del error de y'''
+    
+    # Se extraen los valores de las medidas y el valor de los errores en caso valido
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
-        if sigma is not None:
+        if hasattr(sigma, '__iter__'):
             sigma = y.error
         y = y._medida
-    
+        
+    # Si se pasa un valor inicial que no sea iterable se convierte en un iterable
     if initial_guess is not None and not hasattr(initial_guess, '__iter__'):
-        from inspect import signature
-        if len(signature(funcion).parameters) == 2:
-            initial_guess = (initial_guess, )
-    popt, error = curve_fit(funcion, x, y, p0=initial_guess) if sigma is None else curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
+        initial_guess = (initial_guess, )
+    
+    # Se comprueba que el número de parámetros sea el correcto
+    if len(initial_guess) != len(signature(funcion).parameters) - 1:
+        raise TypeError(f'La longitud de "initial_guess" debe ser {len(signature(funcion).parameters)} se obtuvieron {len(initial_guess)} parametros')        
+    
+    popt, error = curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
+    # Se devuelve una tupla con las medidas obtenidas
     return tuple((Medida(v, e, aproximar=aproximar) for v, e in zip(popt, np.sqrt(np.diag(error)))))
 
 def minimos_cuadrados(x: elementos, y: elementos, aproximar: bool = False) -> Recta:

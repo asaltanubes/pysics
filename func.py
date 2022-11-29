@@ -3,15 +3,15 @@ from pysics.objetos import Medida
 
 
 def rad(grados: Medida) -> Medida:
-    """Transforma un ángulo a radianes"""
-    if not isinstance(grados, Medida):
-        return grados * np.pi/180
-    
-    valores = grados._medida*np.pi/180
-    error = np.pi/180 * grados._error
-    return Medida(valores, error, aproximar = False)
+    """Transforma un ángulo a radianes"""    
+    return grados * np.pi/180
+
+def grad(radianes: Medida):
+    """Transforma un ángulo a grados"""
+    return radianes * 180/np.pi
 
 def sen(x: Medida) -> Medida:
+    """Calcula el seno de una medida"""
     if not isinstance(x, Medida):
         return np.sin(x)
     
@@ -21,6 +21,7 @@ def sen(x: Medida) -> Medida:
     return Medida(valor, error, aproximar = False)
 
 def cos(x: Medida) -> Medida:
+    """Calcula el coseno de una medida"""
     if not isinstance(x, Medida):
         return np.cos(x)
     
