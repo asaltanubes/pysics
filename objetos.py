@@ -57,7 +57,7 @@ class Medida:
     def copy(self):
         """Retorna una copia INDEPENDIENTE de si misma"""
         # los list son para hacer que las listas sean independientes
-        return Medida(list(self._medida), list(self._error), aproximar=False)
+        return Medida(list(self._medida), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
 
     def aprox(self):
         """Aproxima los valores de la medida"""
@@ -108,6 +108,9 @@ class Medida:
             for m, e in zip(self.medida, self.error):
                 l.append(f'{m} ± {e}')
             return ', '.join(l)
+        
+        def a(self):
+            return 'datos'
 
         def tabla(self):
             """Igual que pm pero solo funciona con una medida de longitud 1 por razones de debug"""
