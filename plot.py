@@ -95,6 +95,16 @@ def limits(bottom=None, top=None, left=None, right=None):
     plt.ylim(bottom, top)
     plt.xlim(left, right)
 
+def doble_y(*args, **kargs):
+    '''Añade un segundo eje y al plot.
+    A partir de la llamada a esta funcion se añaden los valores al segundo eje'''
+    plt.twinx(*args, **kargs)
+
+def doble_x(*args, **kargs):
+    '''Añade un segundo eje x al plot.
+    A partir de la llamada a esta funcion se añaden los valores al segundo eje'''
+    plt.twiny()
+
 def xlabel(text, fontsize = 12, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
 
