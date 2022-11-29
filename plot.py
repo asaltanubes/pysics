@@ -91,6 +91,10 @@ def flecha(xy0 = (0,0), xy1=(0,0), arco=0):
     arrowprops = dict(arrowstyle='->', connectionstyle=f"arc3, rad ={arco}")
     plt.annotate('', xy1, xy0, arrowprops=arrowprops)
 
+def limits(bottom=None, top=None, left=None, right=None):
+    plt.ylim(bottom, top)
+    plt.xlim(left, right)
+
 def xlabel(text, fontsize = 12, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
 
