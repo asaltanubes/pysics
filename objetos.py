@@ -69,7 +69,7 @@ class Medida:
 
     def lista_de_medidas(self):
         """Devuelve una lista con los valores contenidos como medidas individuales"""
-        return [Medida(*i, aproximar=False) for i in zip(self._medida, self._error)]
+        return [Medida(*i, aproximar=False).cambia_estilo(self.__print_style) for i in zip(self._medida, self._error)]
 
     def copy(self):
         """Retorna una copia INDEPENDIENTE de si misma"""
@@ -136,6 +136,18 @@ class Medida:
                 return f'{m} ± {e}'
             else:
                 raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
+
+        def tabla_latex(self):
+            """Igual que tabla pero en math mode"""
+            if len(self.medida) == 1:
+                m = self.medida[0]
+                e = self.error[0]
+                if e == 0:
+                    return "$" + str(m)+ "$"
+                return f'${m} ' +  r"\pm" + f' {e}$'
+            else:
+                raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
+            
 
 # -----------------------------------------------------------------------------
 
