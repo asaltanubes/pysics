@@ -5,7 +5,7 @@ from .type_alias import Opcional
 def transpose(lista: list) -> list:
     return list(zip(*lista))
 
-def create_table_list(lista: list, cabecera=None, transponer=False) -> list[list]:
+def create_table_list(lista: list, cabecera=None, transponer=False, estilo = Medida.Estilo.tabla) -> list[list]:
     a = []
     for element in lista:
         if isinstance(element, Medida):
@@ -29,7 +29,7 @@ def terminal(datos: list, cabecera: Opcional[list] = None, transponer: bool = Fa
 
 def latex(datos: list, cabecera: Opcional[list] = None, caption: str = 'Caption', label: str = 'tab:my_label', transponer: bool = False) -> str:
     """Devuelve una cadena de texto que representa una tabla de latex"""
-    tabular = '\n'.join(tabulate(create_table_list(datos, cabecera, transponer), tablefmt='latex').replace(r'\\', '\\\\ \n \\hline').replace(r"\$", r"$").replace(r'\textbackslash{}', "\\").split('\n')[1:-2])
+    tabular = '\n'.join(tabulate(create_table_list(datos, cabecera, transponer, estilo=Medida.Estilo.tabla_latex), tablefmt='latex').replace(r'\\', '\\\\ \n \\hline').replace(r"\$", r"$").replace(r'\textbackslash{}', "\\").split('\n')[1:-2])
     ancho = len(tabular.split('\\hline')[1].split('&'))
     tabular = f'\\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + r'\end{tabular}'
     table = '\\begin{table}[ht]\n \\centering \n\n' + tabular + '\n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\\end{table}'
