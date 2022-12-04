@@ -9,12 +9,13 @@ locale.setlocale(locale.LC_ALL, '')
 usar_notacion_cientifica = True
 rango_sin_notacion_cientifica = (-2, 2)
 
-def scatter(x: elementos, y: elementos, c: str = 'tab:red', marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
+def scatter(x: elementos, y: elementos, c: str = 'tab:red', relleno = False, marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
         y = y._medida
-    plt.scatter(x, y, s=s, marker = marker, facecolors = 'none', edgecolors = c, label=label, zorder = zorder, **kargs)
+    facecolors = 'none' if not relleno else c
+    plt.scatter(x, y, s=s, marker = marker, facecolors = facecolors, edgecolors = c, label=label, zorder = zorder, **kargs)
 
 
 def plot(x: elementos, y: elementos, label=None, **kargs):
@@ -175,10 +176,14 @@ def tick_format(locale = True, useMathText=True, style = '', scilimits = None, *
     plt.ticklabel_format(useLocale=locale, style=style, scilimits=scilimits, useMathText=useMathText, **kargs)
 
 def set_notacion_cientifica(usar=usar_notacion_cientifica, rango=rango_sin_notacion_cientifica):
+    global rango_sin_notacion_cientifica, usar_notacion_cientifica
     usar_notacion_cientifica = usar
     rango_sin_notacion_cientifica = rango
 
 def notacion_cientifica(usar=True, rango = (0, 0)):
+    global rango_sin_notacion_cientifica, usar_notacion_cientifica
+    rango_sin_notacion_cientifica = rango
+    usar_notacion_cientifica = usar
     style = 'sci' if usar else 'plain'
     plt.ticklabel_format(style=style, scilimits=rango)
     
