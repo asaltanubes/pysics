@@ -412,7 +412,7 @@ class Number:
         return str(self.value)
 
     def __repr__(self):
-        return repr(self.value)
+        return f"Number({self.value})"
 
 
 if __name__ == '__main__':
