@@ -9,7 +9,7 @@ def create_table_list(lista: list, cabecera=None, transponer=False, estilo = Med
     a = []
     for element in lista:
         if isinstance(element, Medida):
-            a.append([i.cambia_estilo(Medida.Estilo.tabla) for i in element.lista_de_medidas()])
+            a.append([i.cambia_estilo(estilo) for i in element.lista_de_medidas()])
         else:
             a.append(element)
     lista = a
@@ -29,8 +29,16 @@ def terminal(datos: list, cabecera: Opcional[list] = None, transponer: bool = Fa
 
 def latex(datos: list, cabecera: Opcional[list] = None, caption: str = 'Caption', label: str = 'tab:my_label', transponer: bool = False) -> str:
     """Devuelve una cadena de texto que representa una tabla de latex"""
-    tabular = '\n'.join(tabulate(create_table_list(datos, cabecera, transponer, estilo=Medida.Estilo.tabla_latex), tablefmt='latex').replace(r'\\', '\\\\ \n \\hline').replace(r"\$", r"$").replace(r'\textbackslash{}', "\\").split('\n')[1:-2])
-    ancho = len(tabular.split('\\hline')[1].split('&'))
-    tabular = f'\\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + r'\end{tabular}'
+    # tabular = '\n'.join(tabulate(create_table_list(datos, cabecera, transponer, estilo=Medida.Estilo.tabla_latex), tablefmt='latex').replace(r'\\', '\\\\ \n \\hline').replace(r"\$", r"$").replace(r'\textbackslash{}', "\\").split('\n')[1:-2])
+    # ancho = len(tabular.split('\\hline')[1].split('&'))
+    # tabular = f'\\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + r'\end{tabular}'
+    # table = '\\begin{table}[ht]\n \\centering \n\n' + tabular + '\n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\\end{table}'
+    
+    datos = create_table_list(datos, cabecera, transponer, estilo=Medida.Estilo.tabla_latex)
+    
+    tabular = '\t\t' + '\\\\ \n\t\t'.join(' & '.join(i) for i in datos)
+    ancho = max((len(i) for i in datos))
+    
+    tabular = f'\t \\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + '\t\\end{tabular}'
     table = '\\begin{table}[ht]\n \\centering \n\n' + tabular + '\n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\\end{table}'
     return table
