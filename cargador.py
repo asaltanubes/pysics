@@ -14,7 +14,7 @@ def cargar(archivo: str, separador: str = '\t', linea: str = '\n', decimal: str 
     
     return datos
 
-def guardar_latex(datos: list, archivo: str, separador: str = '\t', linea: str = '\n', por_columnas=True, estilo = Medida.Estilo.tabla_latex):
+def guardar_latex(archivo: str, datos: list, separador: str = '\t', linea: str = '\n', por_columnas=True, estilo = Medida.Estilo.tabla_latex):
     
     # Conversión de datos a strings
     datos = [fila if hasattr(fila, '__iter__') else [fila] for fila in datos]
