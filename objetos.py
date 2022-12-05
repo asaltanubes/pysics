@@ -76,9 +76,12 @@ class Medida:
         # los list son para hacer que las listas sean independientes
         return Medida(list(self._medida), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
 
-    def aprox(self):
+    def aprox(self, decimales = None):
         """Aproxima los valores de la medida"""
-        self._medida, self._error = aprox(self._medida, self._error)
+        if decimales is None:
+            self._medida, self._error = aprox(self._medida, self._error)
+        else:
+            self._medida = [round(i, decimales) for i in self._medida]
         return self
 
     def media(self) -> float:
