@@ -329,13 +329,13 @@ class Number:
         return Number(mpmath.mp.ln(self.value))
     
     def sin(self):
-        return Number(mpmath.mp.sin(self.value))
+        return Number(mpmath.mp.sin(self.value, prec=mpmath.mp.prec+2))
 
     def cos(self):
-        return Number(mpmath.mp.cos(self.value))
+        return Number(mpmath.mp.cos(self.value, prec=mpmath.mp.prec+2))
 
     def tan(self):
-        return Number(mpmath.mp.tan(self.value))
+        return Number(mpmath.mp.tan(self.value, prec=mpmath.mp.prec+2))
     
     def rad(self):
         return Number(mpmath.radians(self.value))
