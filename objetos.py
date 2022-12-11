@@ -2,7 +2,7 @@ from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
 from math import nan
-import decimal
+import mpmath
 
 
 
@@ -99,6 +99,23 @@ class Medida:
     def estimacion(self):
         """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
         return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
+    
+    def rad(self):
+        '''Convierte a radianes desde grados'''
+        m = [n.rad() for n in self._medida]
+        e = [e.rad() for g in self._error]
+        return Medida(m, e, aproximar=False)
+    
+    def grad(self):
+        '''Convierte a grados desde radianes'''
+        m = [n.grad() for n in self._medida]
+        e = [e.grad() for g in self._error]
+        return Medida(m, e, aproximar=False)
+
+    def sqrt(self):
+        m = np.array([m.sqrt() for m in self._medida])
+        e = 1/(2*m)*self._error
+        return Medida(m, e, aproximar=False)
 
     def cambia_estilo(self, estilo):
         if estilo in self.Estilo.__dict__.values():
@@ -111,18 +128,18 @@ class Medida:
         """Clase conteninendo las diferentes funciones que representan la clase medida"""
         def lista(self):
             """[medidas] ± [errores]"""
-            if len(self.medida) == 1:
-                m = self.medida[0]
-                e = self.error[0]
+            if len(self._medida) == 1:
+                m = self._medida[0]
+                e = self._error[0]
             else:
-                m = [str(i) for i in self.medida]
-                e = [str(i) for i in self.error]
+                m = [str(i) for i in self._medida]
+                e = [str(i) for i in self._error]
             return f'{m} ± {e}'
 
         def pm(self):
             """medida 1 ± error 1, medida2 ± error 2, ..."""
             l = []
-            for m, e in zip(self.medida, self.error):
+            for m, e in zip(self._medida, self._error):
                 l.append(f'{m} ± {e}')
             return ', '.join(l)
         
@@ -131,9 +148,9 @@ class Medida:
 
         def tabla(self):
             """Igual que pm pero solo funciona con una medida de longitud 1 por razones de debug"""
-            if len(self.medida) == 1:
-                m = self.medida[0]
-                e = self.error[0]
+            if len(self._medida) == 1:
+                m = self._medida[0]
+                e = self._error[0]
                 if e == 0:
                     return str(m)
                 return f'{m} ± {e}'
@@ -142,9 +159,9 @@ class Medida:
 
         def tabla_latex(self):
             """Igual que tabla pero en math mode"""
-            if len(self.medida) == 1:
-                m = self.medida[0]
-                e = self.error[0]
+            if len(self._medida) == 1:
+                m = self._medida[0]
+                e = self._error[0]
                 if e == 0:
                     return "$" + str(m)+ "$"
                 return f'${m} ' +  r"\pm" + f' {e}$'
@@ -284,56 +301,44 @@ class Number:
             self.value = value.value
         elif isinstance(value, (int, float)):
             value = str(value)
-            self.value = decimal.Decimal(value)
+            self.value = mpmath.mpf(value)
         elif isinstance(value, str):
-            self.value = decimal.Decimal(value)
-        elif isinstance(value, decimal.Decimal):
+            self.value = mpmath.mpf(value)
+        elif isinstance(value, mpmath.mpf):
             self.value = value
+        elif type(value) == type(mpmath.mp.pi):
+            self.value = mpmath.mpf(value)
         elif type(value).__module__ == np.__name__:
             value = float(value)
-            self.value = decimal.Decimal(str(value))
+            self.value = mpmath.mpf(str(value))
         else: raise TypeError(f"Value not suported :{type(value)}")
     
     def sqrt(self):
         return Number(self.value.sqrt())
     
     def exp(self):
-        return Number(self.value.exp())
+        return Number(mpmath.mp.exp(self.value))
     
     def log10(self):
-        return Number(self.value.log10())
+        return Number(mpmath.mp.log10(self.value))
 
     def log(self):
-        return Number(self.value.ln())
+        return Number(mpmath.mp.ln(self.value))
     
     def sin(self):
-        decimal.getcontext().prec += 2
-        i, lasts, s, fact, num, sign = 1, 0, self.value, 1, self.value, 1
-        while s != lasts:
-            lasts = s
-            i += 2
-            fact *= i * (i-1)
-            num *= self.value * self.value
-            sign *= -1
-            s += num / fact * sign
-        decimal.getcontext().prec -= 2
-        return Number(+s)
+        return Number(mpmath.mp.sin(self.value))
 
     def cos(self):
-        decimal.getcontext().prec += 2
-        i, lasts, s, fact, num, sign = 0, 0, 1, 1, 1, 1
-        while s != lasts:
-            lasts = s
-            i += 2
-            fact *= i * (i-1)
-            num *= self.value * self.value
-            sign *= -1
-            s += num / fact * sign
-        decimal.getcontext().prec -= 2
-        return Number(+s)
+        return Number(mpmath.mp.cos(self.value))
 
     def tan(self):
-        return self.sin()/self.cos()
+        return Number(mpmath.mp.tan(self.value))
+    
+    def rad(self):
+        return Number(mpmath.radians(self.value))
+    
+    def grad(self):
+        return Number(mpmath.degrees(self.value))
     
     def __int__(self):
         return int(self.value)
@@ -344,47 +349,44 @@ class Number:
     def __add__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(self.value + other.value)
+        return Number(mpmath.fadd(self.value, other.value, exact=True))
     __radd__ = __add__
     
     def __sub__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(self.value - other.value)
-    def __rsub__(self, other): 
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(other.value - self.value)
+        return Number(mpmath.fsub(self.value, other.value, exact=True))
+    __rsub__ = __sub__
     
     def __mul__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(self.value * other.value)
+        return Number(mpmath.fmul(self.value, other.value, exact=True))
     __rmul__ = __mul__
     
     def __truediv__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(self.value / other.value)
+        return Number(mpmath.fdiv(self.value, other.value, prec=mpmath.mp.prec+2))
     def __rtruediv__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(other.value / self.value)
+        return Number(mpmath.fdiv(other.value, self.value, prec=mpmath.mp.prec+2))
     
     def __pow__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
         if isinstance(other, (int, float)):
             other = Number(other)
-        return Number(self.value**other.value)
+        return Number(mpmath.power(self.value, other.value))
     def __rpow__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(other.value ** self.value)
+        return Number(mpmath.power(other.value, self.value))
     
     def __eq__(self, other):
-        if not isinstance(other, (Number, int, float)):
-            raise TypeError(f"Unsuported operand type(s) for ==: Number and {type(other)}")
+        # if not isinstance(other, (Number, int, float)):
+        #     raise TypeError(f"Unsuported operand type(s) for ==: Number and {type(other)}")
         if isinstance(other, (int, float)):
             other = Number(other)
         return self.value == other.value
@@ -415,10 +417,10 @@ class Number:
         return self.value != other
     
     def __neg__(self):
-        return (-1)*self
+        return Number(mpmath.fneg(self))
     
     def __abs__(self):
-        return Number(self.value.copy_abs())
+        return Number(mpmath.fabs(self.value))
     
     def __round__(self, ndigits=0):
         return Number(round(self.value, ndigits))

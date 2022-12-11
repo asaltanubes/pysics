@@ -1,20 +1,16 @@
-import decimal
-from tkinter import ROUND
-from typing import Type
+from mpmath import mp
 
-decimal.DefaultContext.prec = 60
-decimal.getcontext().prec   = 60
+mp.dps= 60
 
-ROUND_UP = decimal.ROUND_HALF_UP
-ROUND_DOWN = decimal.ROUND_HALF_DOWN
+# ROUND_UP = decimal.ROUND_HALF_UP
+# ROUND_DOWN = decimal.ROUND_HALF_DOWN
 
-def set_rounding(rounding_mode):
-    decimal.getcontext().rounding   = rounding_mode
-    decimal.DefaultContext.rounding = rounding_mode
+# def set_rounding(rounding_mode):
+#     decimal.getcontext().rounding   = rounding_mode
+#     decimal.DefaultContext.rounding = rounding_mode
 
 def set_precision(prec):
-    decimal.getcontext().prec   = prec
-    decimal.DefaultContext.prec = prec
+    mp.dps=prec
 
 def get_precision():
-    return decimal.getcontext().prec
+    return mp.dps
