@@ -170,7 +170,10 @@ class Medida:
             
 
 # -----------------------------------------------------------------------------
-
+    def __abs__(self):
+        return Medida(abs(self._medida), self._error)
+    
+    
     def __add__(self, other):
         if not isinstance(other, Medida):
             other = Medida(other)
