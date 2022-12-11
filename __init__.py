@@ -12,3 +12,4 @@ from . import plot
 from . import tabla
 from . import calculos
 from . import constantes
+from . import stuff
