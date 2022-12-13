@@ -1,6 +1,7 @@
 import numpy as np
 from pysics.objetos import Medida, Number
 from mpmath import radians, degrees
+from mpmath import atan2 as mpatan2
 
 
 def rad(grados: Medida) -> Medida:
@@ -34,6 +35,15 @@ def cos(x: Medida) -> Medida:
 
     error = abs(np.sin(x._medida))*x._error
     return Medida(valor, error, aproximar = False)
+
+def atan2(x: Medida, y: Medida):
+    
+    if not isinstance(x, Medida):
+        x = Medida(x)
+    if not isinstance(y, Medida):
+        y = Medida(y)
+    angulos = [mpatan2(x.value, y.value) for x, y in zip(x._medida, y._medida)]
+    return Medida(angulos, 0)
 
 def ln(x: Medida) -> Medida:
     """Logaritmo natural"""
