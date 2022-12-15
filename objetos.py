@@ -337,6 +337,15 @@ class Number:
     def tan(self):
         return Number(mpmath.mp.tan(self.value, prec=mpmath.mp.prec+2))
     
+    def asin(self):
+        return Number(mpmath.mp.asin(self.value, prec=mpmath.mp.prec+2))
+    
+    def acos(self):
+        return Number(mpmath.mp.acos(self.value, prec=mpmath.mp.prec+2))
+    
+    def atan(self):
+        return Number(mpmath.mp.atan(self.value, prec=mpmath.mp.prec+2))
+    
     def rad(self):
         return Number(mpmath.radians(self.value))
     

@@ -36,14 +36,52 @@ def cos(x: Medida) -> Medida:
     error = abs(np.sin(x._medida))*x._error
     return Medida(valor, error, aproximar = False)
 
-def atan2(x: Medida, y: Medida):
+def tan(x):
     
+    if not isinstance(x, Medida):
+        x = Medida(x)
+    valor = np.tan(x._medida)
+    error = (1+valor**2) * x._error
+    return Medida(valor, error, aproximar=False)
+
+
+def asin(x):
+    
+    if not isinstance(x, Medida):
+        x = Medida(x)
+    valor = np.asin(x._medida)
+    error = x._error/np.sqrt(1-np.power(x._medida, 2))
+    return Medida(valor, error, aproximar=False)
+
+
+def acos(x):
+    
+    if not isinstance(x, Medida):
+        x = Medida(x)
+    valor = np.acos(x._medida)
+    error = x._error/np.sqrt(1-np.power(x._medida, 2))
+    return Medida(valor, error, aproximar=False)
+
+
+def atan(x):
+    
+    if not isinstance(x, Medida):
+        x = Medida(x)
+    valor = np.atan(x._medida)
+    error = x._error/(1-np.power(x._medida, 2))
+    return Medida(valor, error, aproximar=False)
+
+def atan2(x: Medida, y: Medida):
+    """Angulo de un punto en coordenadas polares"""
     if not isinstance(x, Medida):
         x = Medida(x)
     if not isinstance(y, Medida):
         y = Medida(y)
     angulos = [mpatan2(x.value, y.value) for x, y in zip(x._medida, y._medida)]
-    return Medida(angulos, 0)
+    
+    error = np.sqrt((y._medida*x._error)**2+(x._medida*y._error)**2)/np.abs(x**2+y**2)
+    
+    return Medida(angulos, error, aproximar=False)
 
 def ln(x: Medida) -> Medida:
     """Logaritmo natural"""
