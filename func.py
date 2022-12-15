@@ -1,7 +1,7 @@
 import numpy as np
 from pysics.objetos import Medida, Number
-from mpmath import radians, degrees
 from mpmath import atan2 as mpatan2
+from mpmath import mp
 
 
 def rad(grados: Medida) -> Medida:
@@ -77,7 +77,7 @@ def atan2(x: Medida, y: Medida):
         x = Medida(x)
     if not isinstance(y, Medida):
         y = Medida(y)
-    angulos = [mpatan2(x.value, y.value) for x, y in zip(x._medida, y._medida)]
+    angulos = [mpatan2(x.value, y.value, prec=mp.prec+2) for x, y in zip(x._medida, y._medida)]
     
     error = np.sqrt((y._medida*x._error)**2+(x._medida*y._error)**2)/np.abs(x**2+y**2)
     
