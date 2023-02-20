@@ -53,12 +53,14 @@ def minimos_pesados(x: Medida, y: Medida, yerr: Opcional[[float, ...]] = None, a
     Calcula la recta de ajuste por mínimos cuadrados pesados para dos medidas.
     El error del eje y se extrae de la Medida \"y\" y el error del eje x se
     desprecia
-
-    return tuple(Medida, Medida)
-    (pen, n_0)
-    pen: pendiente de la recta de ajuste
-    n_0: ordenada en el origen de la recta de ajuste
+    Args: 
+        pen: pendiente de la recta de ajuste
+        n_0: ordenada en el origen de la recta de ajuste
+    
+    Returns:
+        tuple(Medida, Medida): (pendiente, ordenada en el origen)
     """
+
     p, n = wcalc_line(x=x, y=y, yerr=yerr)
     dp, dn = wsigma_calc_line(x=x, y=y, yerr=yerr)
     pen: Medida = Medida(p, dp, aproximar=aproximar)
@@ -113,6 +115,15 @@ def n_0 (x : elementos, y : elementos) -> float:
     return float((np.sum(y)*np.sum(x**2) - np.sum(x)*np.sum(x*y))/(x.size * np.sum(x**2) - (np.sum(x))**2))
 
 def sigma_y(x : elementos, y : elementos) -> float:
+    """Calcula la desviación estandar de los valores experimentales a su recta de ajuste por mínimos cuadrados
+
+    Args:
+        x (iterable o medida): valores de los puntos en el eje x
+        y (iterable o medida): valores de los puntos en el eje y
+
+    Returns:
+        float: desviación estandar de la recta
+    """
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -124,6 +135,15 @@ def sigma_y(x : elementos, y : elementos) -> float:
     return float(np.sqrt( (np.sum( (y-ŷ)**2 ) ) / (x.size - 2)))
 
 def sigma_pen(x: elementos, y: elementos) -> float:
+    """Calcula la desviación estandar de la pendiente de un ajuste por mínimos cuadrados
+
+    Args:
+        x (Iterable o medida): Valores de los puntos en el eje x
+        y (Iterable o medida): Valores de los puntos en el eje y
+
+    Returns:
+        float: Desviación estandar de la pendiente
+    """
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -134,6 +154,15 @@ def sigma_pen(x: elementos, y: elementos) -> float:
     return float(sigma_y(x, y) *np.sqrt( x.size / (x.size * np.sum(x**2) - np.sum(x)**2) ))
 
 def sigma_n_0(x: elementos, y: elementos) -> float:
+    """Calcula la desviación estandar de la ordenada en el origen de un ajuste por mínimos cuadrados
+
+    Args:
+        x (Iterable o medida): Valores de los puntos en el eje x
+        y (Iterable o medida): Valores de los puntos en el eje y
+
+    Returns:
+        float: Desviación estandar de la ordenada en el origen
+    """
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -141,6 +170,7 @@ def sigma_n_0(x: elementos, y: elementos) -> float:
     x = x if type(x) == type(np.array) else np.array(x)
     y = y if type(y) == type(np.array) else np.array(y)
     return float(sigma_y(x, y) * np.sqrt( np.sum(x**2) / (x.size * np.sum(x**2) - np.sum(x)**2) ))
+
 
 def wcalc_line(x: elementos, y: elementos, yerr: Opcional[[float, ...]]) -> float:
     return wpen(x, y, yerr), wn_0(x, y, yerr)

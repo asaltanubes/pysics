@@ -1,6 +1,6 @@
 from mpmath import mp
 
-mp.dps= 60
+mp.dps = 60
 
 # ROUND_UP = decimal.ROUND_HALF_UP
 # ROUND_DOWN = decimal.ROUND_HALF_DOWN
