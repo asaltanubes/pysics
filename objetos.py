@@ -72,7 +72,7 @@ class Medida:
         return [Medida(*i, aproximar=False).cambia_estilo(self.__print_style) for i in zip(self._medida, self._error)]
 
     def copy(self):
-        """Retorna una copia INDEPENDIENTE de si misma"""
+        """Retorna una copia INDEPENDIENTE de si misma. Todos los punteros a los datos son distintos"""
         # los list son para hacer que las listas sean independientes
         return Medida(list(self._medida), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
 
@@ -118,6 +118,7 @@ class Medida:
         return Medida(m, e, aproximar=False)
 
     def cambia_estilo(self, estilo):
+        """Cambia el estilo actual por otro"""
         if estilo in self.Estilo.__dict__.values():
             self.__print_style = estilo
             return self

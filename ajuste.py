@@ -70,6 +70,16 @@ def minimos_pesados(x: Medida, y: Medida, yerr: Opcional[[float, ...]] = None, a
     return Recta(pen, n_0, x)
 
 def line(x: elementos , pen: float, n_0: float=0) -> list[float]:
+    """Dados una pendiente, una ordenada en el orígen y un rango de valores del eje x crea una línea evaluandola en los puntos de x
+
+    Args:
+        x (elementos): puntos en los que la recta va a ser evaluada
+        pen (float): pendiente de la recta
+        n_0 (float, optional): ordenada en el origen de la recta. Defaults to 0.
+
+    Returns:
+        list[float]: la recta dada evaluada en los puntos proporcionados en x
+    """
     if isinstance(x, Medida):
         x = x._medida
 
@@ -172,13 +182,34 @@ def sigma_n_0(x: elementos, y: elementos) -> float:
     return float(sigma_y(x, y) * np.sqrt( np.sum(x**2) / (x.size * np.sum(x**2) - np.sum(x)**2) ))
 
 
-def wcalc_line(x: elementos, y: elementos, yerr: Opcional[[float, ...]]) -> float:
+def wcalc_line(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> tuple[float, float]:
+    """Calcula una recta por mínimos cuadrados pesados
+
+    Args:
+        x (elementos): Valores del eje x de la recta
+        y (elementos): Valores del eje y de la recta
+        yerr (Opcional[[float, ...]]): Errores en el eje y (Si no se pasa un valor entoces se tomo el error de la y en caso de ser una medida)
+
+    Returns:
+        tuple[float, float]: pajera pendinete-ordenada en el origen de los valores obtenidos
+    """
     return wpen(x, y, yerr), wn_0(x, y, yerr)
 
 def wsigma_calc_line(x: elementos, y: elementos, yerr: Opcional[[float, ...]]) -> float:
+    """Calcula los errores estandard del ajuste por mínimos cuadrados pesados
+
+    Args:
+        x (elementos): Valores del eje x de la recta
+        y (elementos): Valores del eje y de la recta
+        yerr (Opcional[[float, ...]]): Errores en el eje y (Si no se pasa un valor entoces se tomo el error de la y en caso de ser una medida)
+
+    Returns:
+        tuple[float, float]: pajera error de la pendinete-ordenada en el origen de los valores obtenidos (sigma pen, sigma n_0)
+    """
     return wsigma_pen(x, y, yerr), wsigma_n_0(x, y, yerr)
 
 def wpen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
+    """Calcula la pendiente por un ajuste por mínimos cuadrados pesados"""
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -194,6 +225,7 @@ def wpen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> flo
     return float((np.sum(w)*np.sum(w*x*y) - np.sum(w*x)*np.sum(w*y)) / (np.sum(w) * np.sum(w*x**2) - np.sum(w*x)**2))
 
 def wn_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
+    """Calcula la ordenada en el orígen por un ajuste por mínimos cuadrados pesados"""
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -209,6 +241,7 @@ def wn_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> flo
     return float(( np.sum(w*y) * np.sum(w*x**2) - np.sum(w*x) * np.sum(w*x*y)) / (np.sum(w) * np.sum(w * x**2) - np.sum(w*x)**2))
 
 def wsigma_pen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
+    """Calcula el error estandar en la ordenada en el orígen del ajuste por mínimos pesados"""
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -224,6 +257,7 @@ def wsigma_pen(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) 
     return float(np.sqrt(np.sum(w) / ( np.sum(w) * np.sum(w*x**2) - np.sum(w*x)**2 ) ))
 
 def wsigma_n_0(x: elementos, y: elementos, yerr: Opcional[[float, ...]] = None) -> float:
+    """Calcula el error estandar en la ordenada en el orígen del ajuste por mínimos pesados"""
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):

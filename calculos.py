@@ -10,6 +10,7 @@ mp.dps = 60
 #     decimal.DefaultContext.rounding = rounding_mode
 
 def set_precision(prec):
+    """Cambia el número de posiciones decimales empleadas para realizar cálculos"""
     mp.dps=prec
 
 def get_precision():
