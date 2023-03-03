@@ -1,8 +1,9 @@
 from pysics.aprox import aprox
 from pysics.estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
-from math import nan
+from math import nan, ceil, floor
 import mpmath
+import calculos
 
 
 
@@ -10,7 +11,8 @@ def _tratar_error(medida, error):
     '''
     Convierte un error pasado a una medida en un error que la medida puede manejar
     El tipo debe ser np.ndarray[Number]. Si se pasa un solo valor a la función se
-    toma como un error constante para toda la medida'''
+    toma como un error constante para toda la medida
+    '''
     
     if hasattr(error, '__iter__'):
         if not len(medida) == len(error):
@@ -81,7 +83,9 @@ class Medida:
         if decimales is None:
             self._medida, self._error = aprox(self._medida, self._error)
         else:
-            self._medida = [round(i, decimales) for i in self._medida]
+            self._medida = [calculos.round(i, decimales) for i in self._medida]
+            self._error = [calculos.round(i, decimales) for i in self._error]
+            
         return self
 
     def media(self) -> float:
@@ -436,7 +440,13 @@ class Number:
         return Number(mpmath.fabs(self.value))
     
     def __round__(self, ndigits=0):
-        return Number(round(self.value, ndigits))
+        return Number(round(self.value, ndigits=ndigits))
+    
+    def __ceil__(self):
+        return Number(ceil(self.value))
+    
+    def __floor__(self):
+        return Number(floor(self.value))
     
     def __str__(self):
         return str(self.value)

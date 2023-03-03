@@ -2,6 +2,7 @@ import numpy as np
 # from VACIO import NULL
 from math import log10, trunc, floor, isnan, isinf, nan
 from .type_alias import elementos
+from . import calculos
 
 def aprox(valor: list[float] or float, error: list[float] or float) -> tuple[float, float] or tuple[list[float], list[float]]:
     """Aproxima un valor y su error a la primera cifra significativa del error (3.894 ± 0.26 -> 4.0 ± 0.3) o a las dos primeras si la primera es 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
@@ -67,10 +68,15 @@ def apr(valor: float, error: float) -> tuple[float, float]:
         return (valor, apr(1, error)[1])
     a = truncar(error, -cifra_significativa(error))
     
+    cifras_error = -cifra_significativa(error)
+    a = truncar(error, cifras_error)
+    
     # Si la primera cifra significativa es un 1
     if log10(a) == floor(log10(a)):
-        return (round(valor, 1-cifra_significativa(error)), round(error, 1-cifra_significativa(error)))
-    return (round(valor, -cifra_significativa(error)), round(error, -cifra_significativa(error)))
+        # Si al aproximar a la siguiente el resultado es 1 entonces se coge también la siguiente
+        if calculos.round(error, cifras_error) == 10**(-cifras_error):
+            cifras_error += 1
+    return (calculos.round(valor, cifras_error), calculos.round(error, cifras_error))
 
 def apr_list(valor: list[float], error: list[float]) -> tuple[list[float], list[float]]:
     """Aplica apr a una lista de valores y errores"""
@@ -110,8 +116,8 @@ def apr_list(valor: list[float], error: list[float]) -> tuple[list[float], list[
 #                 cifra_significativa += 1
 #             break
 #     posición_punto = string_error.find('.') if '.' in string_error else len(string_error)
-#     round_pos = cifra_significativa - posición_punto + 1
-#     return (round(valor, round_pos), round(error, round_pos))
+#     calculos.round_pos = cifra_significativa - posición_punto + 1
+#     return (calculos.round(valor, calculos.round_pos), calculos.round(error, calculos.round_pos))
 
 if __name__ == '__main__':
     a = [8.365241, 935.27, 89523.68586583]
