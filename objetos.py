@@ -1,9 +1,9 @@
-from pysics.aprox import aprox
-from pysics.estadistica import media, desviacion_estandar, error_estandar
+from .aprox import aprox
+from .estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
 from math import nan, ceil, floor
 import mpmath
-import calculos
+from . import calculos
 
 
 
