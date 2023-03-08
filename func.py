@@ -68,7 +68,7 @@ def atan(x):
     if not isinstance(x, Medida):
         x = Medida(x)
     valor = np.arctan(x._medida)
-    error = x._error/(1-np.power(x._medida, 2))
+    error = x._error/(1+np.power(x._medida, 2))
     return Medida(valor, error, aproximar=False)
 
 def atan2(x: Medida, y: Medida):

@@ -107,13 +107,13 @@ class Medida:
     def rad(self):
         '''Convierte a radianes desde grados'''
         m = [n.rad() for n in self._medida]
-        e = [e.rad() for g in self._error]
+        e = [g.rad() for g in self._error]
         return Medida(m, e, aproximar=False)
     
     def grad(self):
         '''Convierte a grados desde radianes'''
         m = [n.grad() for n in self._medida]
-        e = [e.grad() for g in self._error]
+        e = [g.grad() for g in self._error]
         return Medida(m, e, aproximar=False)
 
     def sqrt(self):

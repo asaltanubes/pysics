@@ -1,6 +1,5 @@
 import numpy as np
-# from VACIO import NULL
-from math import log10, trunc, floor, isnan, isinf, nan
+from math import trunc, isnan, isinf, nan
 from .type_alias import elementos
 from . import calculos
 
@@ -45,7 +44,7 @@ def cifra_significativa(num: float) -> int:
     Returns:
         int: posición de la cifra significativa (10**cifra_sinificativa tiene el mismo orden de magnitud que num)
     """
-    return floor(log10(abs(num)))
+    return np.floor(np.log10(abs(num)))
 
 def apr(valor: float, error: float) -> tuple[float, float]:
     """Aproxima un valor y su error a la primera cifra significativa del error (3.894 ± 0.26 -> 4.0 ± 0.3) o a las dos primeras si la primera es 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
@@ -72,7 +71,7 @@ def apr(valor: float, error: float) -> tuple[float, float]:
     a = truncar(error, cifras_error)
     
     # Si la primera cifra significativa es un 1
-    if log10(a) == floor(log10(a)):
+    if np.log10(a) == np.floor(np.log10(a)):
         # Si al aproximar a la siguiente el resultado es 1 entonces se coge también la siguiente
         if calculos.round(error, cifras_error) == 10**(-cifras_error):
             cifras_error += 1
