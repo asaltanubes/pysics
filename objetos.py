@@ -438,7 +438,7 @@ class Number:
         return self.value != other
     
     def __neg__(self):
-        return Number(mpmath.fneg(self))
+        return Number(mpmath.fneg(self.value))
     
     def __abs__(self):
         return Number(mpmath.fabs(self.value))
@@ -454,6 +454,9 @@ class Number:
     
     def __str__(self):
         return str(self.value)
+    
+    def __trunc__(self):
+        return Number(floor(self.value))
 
     def __repr__(self):
         return f"Number({self.value})"
