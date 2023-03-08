@@ -72,8 +72,9 @@ def apr(valor: float, error: float) -> tuple[float, float]:
     
     # Si la primera cifra significativa es un 1
     if np.log10(a) == np.floor(np.log10(a)):
-        # Si al aproximar a la siguiente el resultado es 1 entonces se coge también la siguiente
-        if calculos.round(error, cifras_error) == 10**(-cifras_error):
+        # Si al aproximar a la siguiente el resultado es 1 entonces se coge también la siguiente.
+        # compruebo si es menor que 2 por posibles errores de punto flotante. Odio la aritmética de punto flotante.
+        if calculos.round(error, cifras_error) < 2*10**(-cifras_error):
             cifras_error += 1
     return (calculos.round(valor, cifras_error), calculos.round(error, cifras_error))
 

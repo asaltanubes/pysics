@@ -1,5 +1,5 @@
 from mpmath import mp
-from math import floor, ceil
+from numpy import floor, ceil
 
 mp.dps = 60
 

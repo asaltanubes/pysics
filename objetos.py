@@ -370,19 +370,19 @@ class Number:
     def __add__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(mpmath.fadd(self.value, other.value, exact=True))
+        return Number(mpmath.fadd(self.value, other.value, prec=mpmath.mp.prec+2))
     __radd__ = __add__
     
     def __sub__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(mpmath.fsub(self.value, other.value, exact=True))
+        return Number(mpmath.fsub(self.value, other.value, prec=mpmath.mp.prec+2))
     __rsub__ = __sub__
     
     def __mul__(self, other):
         if not isinstance(other, Number):
             other = Number(other)
-        return Number(mpmath.fmul(self.value, other.value, exact=True))
+        return Number(mpmath.fmul(self.value, other.value, prec=mpmath.mp.prec+2))
     __rmul__ = __mul__
     
     def __truediv__(self, other):
@@ -447,10 +447,10 @@ class Number:
         return Number(round(self.value, ndigits=ndigits))
     
     def __ceil__(self):
-        return Number(ceil(self.value))
+        return Number(mpmath.ceil(self.value))
     
     def __floor__(self):
-        return Number(floor(self.value))
+        return Number(mpmath.floor(self.value))
     
     def __str__(self):
         return str(self.value)
