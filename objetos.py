@@ -351,6 +351,10 @@ class Number:
     def atan(self):
         return Number(mpmath.mp.atan(self.value, prec=mpmath.mp.prec+2))
     
+    arcsin = asin
+    arccos = acos
+    arctan = atan
+     
     def rad(self):
         return Number(mpmath.radians(self.value))
     

@@ -49,7 +49,7 @@ def asin(x):
     
     if not isinstance(x, Medida):
         x = Medida(x)
-    valor = np.asin(x._medida)
+    valor = np.arcsin(x._medida)
     error = x._error/np.sqrt(1-np.power(x._medida, 2))
     return Medida(valor, error, aproximar=False)
 
@@ -58,7 +58,7 @@ def acos(x):
     
     if not isinstance(x, Medida):
         x = Medida(x)
-    valor = np.acos(x._medida)
+    valor = np.arccos(x._medida)
     error = x._error/np.sqrt(1-np.power(x._medida, 2))
     return Medida(valor, error, aproximar=False)
 
@@ -67,7 +67,7 @@ def atan(x):
     
     if not isinstance(x, Medida):
         x = Medida(x)
-    valor = np.atan(x._medida)
+    valor = np.arctan(x._medida)
     error = x._error/(1-np.power(x._medida, 2))
     return Medida(valor, error, aproximar=False)
 
