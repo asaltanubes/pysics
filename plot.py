@@ -9,7 +9,7 @@ locale.setlocale(locale.LC_ALL, '')
 usar_notacion_cientifica = True
 rango_sin_notacion_cientifica = (-2, 2)
 
-def scatter(x: elementos, y: elementos, c: str = 'tab:red', relleno = False, marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
+def scatter(x: elementos, y: elementos, c: str = 'tab:red', relleno = True, marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
@@ -59,7 +59,7 @@ def curva(funcion, x, coeficientes, label = None, **kargs):
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)
 
-def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
+def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', puntos_rellenos = True, marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):
         if xerr == None:
             xerr = x.error
@@ -69,7 +69,8 @@ def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcol
             yerr = y.error
         y = y.medida
     plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', zorder = barzorder)
-    plt.scatter(x, y, s=s, marker = marker, c = 'none', edgecolors = dotcolor, label=label, zorder = dotzorder)
+    facecolor = 'none' if not puntos_rellenos else dotcolor
+    plt.scatter(x, y, s=s, marker = marker, c = facecolor, edgecolors = dotcolor, label=label, zorder = dotzorder)
 
 def errorbar(x: elementos, y: elementos, yerr=None, xerr = None, errorbarcolor = 'tab:red', **kargs):
     if isinstance(x, Medida):
