@@ -3,7 +3,7 @@ from os.path import exists
 from .ajuste import line as ajuste_linea
 from .objetos import Medida, Recta
 from .type_alias import elementos
-from numpy import linspace
+from numpy import linspace, geomspace
 import locale
 locale.setlocale(locale.LC_ALL, '')
 usar_notacion_cientifica = True
@@ -39,7 +39,7 @@ def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', l
         x = x.x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
-def curva(funcion, x, coeficientes, label = None, **kargs):
+def curva(funcion, x, coeficientes, log_linspace = False, label = None, **kargs):
     # Coeficientes puede ser una medida o un iterable de medidas
     # En el primero cada coeficiente es el valor de cada medida.
     # En el segundo cada coeficiente es el primer valor de la medida
@@ -55,7 +55,7 @@ def curva(funcion, x, coeficientes, label = None, **kargs):
         if len(signature(funcion).parameters) == 2:
             coeficientes = (coeficientes, )
             
-    x = linspace(min(x), max(x))
+    x = linspace(min(x), max(x)) if not log_linspace else geomspace(min(x), max(x))
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)
 
@@ -155,22 +155,28 @@ def tight_layout():
 def tamaño(left=.1, right = .9, bottom=.1, top=.9, **kargs):
     plt.subplots_adjust(left=left, right=right, bottom=bottom, top=top, **kargs)
 
-def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'figure', auto_size = True, auto_tick_format = True, **kargs):
+def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'figure', auto_size = True, auto_tick_format = True, xlogscale=False, **kargs):
     if not sobrescribir:
         if exists(f'{lugar}.{formato}'):
             i = 0
             while exists(f'{lugar}({i}).{formato}'):
                 i += 1
             lugar = lugar + f'({i})'
-    if auto_tick_format: tick_format()
+    if xlogscale:
+        if auto_tick_format: print("WARNING: auto_tick_format no es compatible con logscale. Se ha desactivado automaticamente")
+    if auto_tick_format and not xlogscale: tick_format()
     if auto_size: tight_layout()
-    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
+    if xlogscale: plt.xscale("log")
+    notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
-def show(auto_size = True, auto_tick_format = True):
-    if auto_tick_format: tick_format()
+def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
+    if xlogscale:
+        if auto_tick_format: print("WARNING: auto_tick_format no es compatible con logscale. Se ha desactivado automaticamente")
+    if auto_tick_format and not xlogscale: tick_format()
     if auto_size: tight_layout()
-    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
+    if xlogscale: plt.xscale("log")
+    notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
     plt.show()
 
 def tick_format(locale = True, useMathText=True, style = '', scilimits = None, **kargs):
@@ -182,11 +188,7 @@ def set_notacion_cientifica(usar=usar_notacion_cientifica, rango=rango_sin_notac
     rango_sin_notacion_cientifica = rango
 
 def notacion_cientifica(usar=True, rango = (0, 0)):
-    global rango_sin_notacion_cientifica, usar_notacion_cientifica
-    rango_sin_notacion_cientifica = rango
-    usar_notacion_cientifica = usar
-    style = 'sci' if usar else 'plain'
-    plt.ticklabel_format(style=style, scilimits=rango)
+    if usar: plt.ticklabel_format(style="sci", scilimits=rango)
     
 def use_latex(usar=True):
     if usar: plt.rcParams.update({"text.usetex": usar})
