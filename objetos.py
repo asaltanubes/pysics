@@ -453,13 +453,13 @@ class Number:
         return Number(mpmath.floor(self.value))
     
     def __str__(self):
-        return str(self.value)
+        return mpmath.nstr(self.value, mpmath.mp.dps, min_fixed=-4, max_fixed=5)
     
     def __trunc__(self):
         return Number(floor(self.value))
 
     def __repr__(self):
-        return f"Number({self.value})"
+        return f"Number({mpmath.nstr(self.value, mpmath.mp.dps, min_fixed=-4, max_fixed=5)})"
 
 
 if __name__ == '__main__':
