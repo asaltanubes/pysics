@@ -22,7 +22,7 @@ def _tratar_error(medida, error):
             error = (error * len(medida))
     else:
                 error = [error]*len(medida)
-    return np.array([Number(i) for i in error])
+    return np.array([abs(Number(i)) for i in error])
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
     (en una lista) y sus respectivos errores"""
@@ -319,7 +319,9 @@ class Number:
         elif type(value).__module__ == np.__name__:
             value = float(value)
             self.value = mpmath.mpf(str(value))
-        else: raise TypeError(f"Value not suported :{type(value)}")
+        elif isinstance(value, mpmath.mpc):
+            raise TypeError("Un número complejo salvaje ha aparecido, algo ha ido mal :/")
+        else: raise TypeError(f"Value not suported : {type(value)}")
     
     def sqrt(self):
         return Number(self.value.sqrt())
@@ -377,7 +379,11 @@ class Number:
         if not isinstance(other, Number):
             other = Number(other)
         return Number(mpmath.fsub(self.value, other.value, prec=mpmath.mp.prec+2))
-    __rsub__ = __sub__
+    
+    def __rsub__(self, other):
+        if not isinstance(other, Number):
+            other = Number(other)
+        return Number(mpmath.fsub(other.value, self.value, prec=mpmath.mp.prec+2))
     
     def __mul__(self, other):
         if not isinstance(other, Number):
