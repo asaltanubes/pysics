@@ -22,8 +22,13 @@ def sen(x: Medida) -> Medida:
         return np.sin(x)
     
     valor = np.sin(x._medida)
-
-    error = abs(np.cos(x._medida))*x._error
+    error = np.abs(np.cos(x._medida))*x._error
+    
+    
+    null_values = [i for i, v in enumerate(valor) if v==1 or v==-1]
+    for i in null_values:
+        error[i] = np.abs(np.sin(x._medida[i]+x._error[i])-np.sin(x._medida[i]))
+        
     return Medida(valor, error, aproximar = False)
 
 def cos(x: Medida) -> Medida:
@@ -32,8 +37,13 @@ def cos(x: Medida) -> Medida:
         return np.cos(x)
     
     valor = np.cos(x._medida)
-
-    error = abs(np.sin(x._medida))*x._error
+    error = np.abs(np.sin(x._medida))*x._error
+    
+    null_values = [i for i, v in enumerate(valor) if v==1 or v==-1]
+    
+    for i in null_values:
+        error[i] = np.abs(np.cos(x._medida[i]+x._error[i])-np.cos(x._medida[i]))
+    
     return Medida(valor, error, aproximar = False)
 
 def tan(x):
@@ -49,8 +59,21 @@ def asin(x):
     
     if not isinstance(x, Medida):
         x = Medida(x)
-    valor = np.arcsin(x._medida)
-    error = x._error/np.sqrt(1-np.power(x._medida, 2))
+        
+    if not (1 in x._medida or -1 in x._medida):
+        valor = np.arcsin(x._medida)
+        error = x._error/np.sqrt(1-np.power(x._medida, 2))
+    else: 
+        valor = np.zeros(len(x._medida))
+        error = np.zeros(len(x._error))
+        for i, (v, e) in enumerate(zip(x._medida, x._error)):
+            if v != 1 and v != -1:
+                valor[i] = np.arcsin(v)
+                error[i] = e/np.sqrt(1-np.power(x, 2))
+            else:
+                valor[i] = np.arcsin(v)
+                error[i] = np.abs(np.arcsin(v-e)-v)
+            
     return Medida(valor, error, aproximar=False)
 
 
@@ -58,8 +81,21 @@ def acos(x):
     
     if not isinstance(x, Medida):
         x = Medida(x)
-    valor = np.arccos(x._medida)
-    error = x._error/np.sqrt(1-np.power(x._medida, 2))
+        
+    if not (1 in x._medida or -1 in x._medida):
+        valor = np.arccos(x._medida)
+        error = x._error/np.sqrt(1-np.power(x._medida, 2))
+    else:
+        valor = np.zeros(len(x._medida))
+        error = np.zeros(len(x._error))
+        for i, (v, e) in enumerate(zip(x._medida, x._error)):
+            if v != 1 and v != -1:
+                valor[i] = np.arccos(v)
+                error[i] = e/np.sqrt(1-np.power(x, 2))
+            else:
+                valor[i] = np.arccos(v)
+                d = v-e if v>0 else v+e
+                error[i] = np.abs(np.arccos(d)-np.arccos(v))
     return Medida(valor, error, aproximar=False)
 
 
@@ -119,3 +155,7 @@ def delta(x: Medida) -> Medida:
         valores.append(v._medida[0])
         errores.append(v._error[0])
     return Medida(valores, errores, aproximar=False)
+
+if __name__ == '__main__':
+    print(cos(acos(Medida(1, 0.1))))
+    
