@@ -6,6 +6,10 @@ import mpmath
 from . import calculos
 
 
+# Markers para indexar en medidas
+VALOR = object()
+ERROR = object()
+
 
 def _tratar_error(medida, error):
     '''
@@ -243,7 +247,43 @@ class Medida:
         return len(self._medida)
 
     def __getitem__(self, index):
-        return Medida(self._medida[index], self._error[index], aproximar=False)
+        if not hasattr(index, '__getitem__'):
+            return Medida(self._medida[index], self._error[index], aproximar=False)
+        
+        indice_deseado = index[0]
+        valor_o_error = index[1]
+        if valor_o_error is VALOR:
+            return self._medida[indice_deseado]
+        elif valor_o_error is ERROR:
+            return self._error[indice_deseado]
+        raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")    
+    
+    def __setitem__(self, index, value):
+        if isinstance(value, Medida) and len(value) > 1:
+            raise Exception("No puede sobreescribirse más de un índice al tiempo")
+        if not isinstance(value, Medida):
+            if hasattr(value, "__iter__"):
+                value = Medida(*value, aproximar=False)
+            else:
+                # esto podría ser el valor o el error
+                if not hasattr(index, '__getitem__'):
+                    raise Exception("No se ha especificado si el a actualizar debe ser la medida o el error")
+                value = Medida(value, value, aproximar=False)
+                
+        if not hasattr(index, '__getitem__'):
+            self._medida[index] = value._medida[0]
+            self._error[index] = value._error[0]
+        else:
+            indice_deseado = index[0]
+            valor_o_error = index[1]
+            if valor_o_error is VALOR:
+                self._medida[indice_deseado] = value._medida[0]
+            elif valor_o_error is ERROR:
+                self._error[indice_deseado] = value._error[0]
+            else: raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")
+            
+        
+            
 
     def __neg__(self):
         return (-1)*self.copy()

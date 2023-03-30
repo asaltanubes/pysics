@@ -1,4 +1,4 @@
-from .objetos import Medida, Recta, Number
+from .objetos import Medida, Recta, Number, VALOR, ERROR
 from .cargador import cargar
 from .constantes import pi
 
