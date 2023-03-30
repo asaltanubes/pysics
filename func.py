@@ -69,7 +69,7 @@ def asin(x):
         for i, (v, e) in enumerate(zip(x._medida, x._error)):
             if v != 1 and v != -1:
                 valor[i] = np.arcsin(v)
-                error[i] = e/np.sqrt(1-np.power(x, 2))
+                error[i] = e/np.sqrt(1-np.power(v, 2))
             else:
                 valor[i] = np.arcsin(v)
                 error[i] = np.abs(np.arcsin(v-e)-v)
@@ -91,7 +91,7 @@ def acos(x):
         for i, (v, e) in enumerate(zip(x._medida, x._error)):
             if v != 1 and v != -1:
                 valor[i] = np.arccos(v)
-                error[i] = e/np.sqrt(1-np.power(x, 2))
+                error[i] = e/np.sqrt(1-np.power(v, 2))
             else:
                 valor[i] = np.arccos(v)
                 d = v-e if v>0 else v+e
