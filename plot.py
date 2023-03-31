@@ -191,4 +191,7 @@ def notacion_cientifica(usar=True, rango = (0, 0)):
     if usar: plt.ticklabel_format(style="sci", scilimits=rango)
     
 def use_latex(usar=True):
-    if usar: plt.rcParams.update({"text.usetex": usar})
+    plt.rc("text", usetex= usar)
+
+def use_latex_packages(*packages):
+     plt.rc('text.latex', preamble="\n".join((r"\usepackage{" + i + "}" for i in packages)))

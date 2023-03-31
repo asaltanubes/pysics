@@ -24,7 +24,7 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
         initial_guess = (initial_guess, )
     
     # Se comprueba que el número de parámetros sea el correcto
-    if len(initial_guess) != len(signature(funcion).parameters) - 1:
+    if initial_guess is not None and len(initial_guess) != len(signature(funcion).parameters) - 1:
         raise TypeError(f'La longitud de "initial_guess" debe ser {len(signature(funcion).parameters)} se obtuvieron {len(initial_guess)} parametros')        
     
     popt, error = curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
