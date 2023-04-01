@@ -259,32 +259,44 @@ class Medida:
         raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")    
     
     def __setitem__(self, index, value):
-        if isinstance(value, Medida) and len(value) > 1:
-            raise Exception("No puede sobreescribirse más de un índice al tiempo")
-        if not isinstance(value, Medida):
-            if hasattr(value, "__iter__"):
-                value = Medida(*value, aproximar=False)
-            else:
-                # esto podría ser el valor o el error
-                if not hasattr(index, '__getitem__'):
-                    raise Exception("No se ha especificado si el a actualizar debe ser la medida o el error")
-                value = Medida(value, value, aproximar=False)
-                
-        if not hasattr(index, '__getitem__'):
-            self._medida[index] = value._medida[0]
-            self._error[index] = value._error[0]
-        else:
-            indice_deseado = index[0]
+        if hasattr(index, "__getitem__"):
+            indice = index[0]
             valor_o_error = index[1]
-            if valor_o_error is VALOR:
-                self._medida[indice_deseado] = value._medida[0]
-            elif valor_o_error is ERROR:
-                self._error[indice_deseado] = value._error[0]
-            else: raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")
+            value = Medida(value)
+            if type(indice) == slice:
+                if valor_o_error is VALOR:
+                    self._medida[indice] = value._medida
+                elif valor_o_error is ERROR:
+                    self._error[indice] = value._medida
+                else: raise Exception("No se ha especificado si se debe actualizar medida o error")
+                if len(self._medida) != len(self._error):
+                    raise TypeError("El valor nuevo no llena todos los datos anteriores")
+            else:
+                if valor_o_error is VALOR:
+                    self._medida[indice] = value._medida[0]
+                elif valor_o_error is ERROR:
+                    self._error[indice] = value._medida[0]
+                else: raise Exception("No se ha especificado si se debe actualizar medida o error")
+                if len(self._medida) != len(self._error):
+                    raise TypeError("El valor nuevo no llena todos los datos anteriores")
+        else:
+            if type(index) == slice:
+                if isinstance(value, Medida):
+                    self._medida[index] = value._medida
+                    self._error[index] = value._error
+                if hasattr(value, "__getitem__"):
+                    value = Medida(value[0], value[1])
+                    self._medida[index] = value._medida
+                    self._error[index] = value._error
+            else:
+                if isinstance(value, Medida):
+                    self._medida[index] = value._medida[0]
+                    self._error[index] = value._error[0]
+                if hasattr(value, "__getitem__"):
+                    value = Medida(value[0], value[1])
+                    self._medida[index] = value._medida[0]
+                    self._error[index] = value._error[0]
             
-        
-            
-
     def __neg__(self):
         return (-1)*self.copy()
 
