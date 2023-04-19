@@ -87,8 +87,8 @@ class Medida:
         if decimales is None:
             self._medida, self._error = aprox(self._medida, self._error)
         else:
-            self._medida = [calculos.round(i, decimales) for i in self._medida]
-            self._error = [calculos.round(i, decimales) for i in self._error]
+            self._medida = np.array([calculos.round(i, decimales) for i in self._medida])
+            self._error = np.array([calculos.round(i, decimales) for i in self._error])
             
         return self
 
