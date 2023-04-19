@@ -27,6 +27,7 @@ def plot(x: elementos, y: elementos, label=None, **kargs):
         y = ajuste_linea(x, y)
     plt.plot(x, y, label = label, **kargs)
 
+
 def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', label=None, **kargs):
     if isinstance(x, Medida):
         x = x._medida
@@ -52,12 +53,39 @@ def curva(funcion, x, coeficientes, log_linspace = False, label = None, **kargs)
             coeficientes = [i.medida[0] for i in coeficientes]
     else:
         from inspect import signature
-        if len(signature(funcion).parameters) == 2:
+        if len(signature(funcion).parameters) == 2 or hasattr(coeficientes, '__iter__'):
             coeficientes = (coeficientes, )
             
     x = linspace(min(x), max(x)) if not log_linspace else geomspace(min(x), max(x))
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)
+
+def polar_plot(theta: elementos, r: elementos, label=None,  **kargs):
+    if isinstance(theta, Medida):
+        theta = theta._medida
+    if isinstance(r, Medida):
+        r = r._medida
+    plt.polar(theta, r, label=label, **kargs)
+
+def polar_scatter(theta, r, c: str = 'tab:red', relleno = True, marker: str = 'o', s: int = 5, label: str = None, zorder: int = 100, **kargs):
+    facecolors = 'none' if not relleno else c
+    polar_plot(theta, r, marker=marker, markerfacecolor= facecolors, markeredgecolor=c, linestyle='None', markersize=s, label=label, zorder=zorder, **kargs)
+    
+def polar_curva(funcion, theta, coeficientes, label=None, **kargs):
+    if isinstance(coeficientes, Medida):
+        coeficientes = coeficientes.medida
+        
+    if hasattr(coeficientes, '__iter__'):
+        if isinstance(coeficientes[0], Medida):
+            coeficientes = [i.medida[0] for i in coeficientes]
+    else:
+        from inspect import signature
+        if len(signature(funcion).parameters) == 2 or hasattr(coeficientes, '__iter__'):
+            coeficientes = (coeficientes, )
+            
+    theta = linspace(min(theta), max(theta))
+    r = [funcion(i, *coeficientes) for i in theta]
+    polar_plot(theta, r, label=label, **kargs)
 
 def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', puntos_rellenos = True, marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
     if isinstance(x, Medida):
@@ -111,7 +139,7 @@ def doble_y(*args, **kargs):
 def doble_x(*args, **kargs):
     '''Añade un segundo eje x al plot.
     A partir de la llamada a esta funcion se añaden los valores al segundo eje'''
-    plt.twiny()
+    plt.twiny(*args, **kargs)
 
 def xlabel(text, fontsize = 12, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
@@ -173,11 +201,16 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
 def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
     if xlogscale:
         if auto_tick_format: print("WARNING: auto_tick_format no es compatible con logscale. Se ha desactivado automaticamente")
-    if auto_tick_format and not xlogscale: tick_format()
+    if auto_tick_format and not xlogscale: 
+        try:
+            tick_format()
+        except AttributeError:
+            print("WARNING: auto_tick_format no funciona en plots polares y se desactiva por defecto")
+        
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
     notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
-    plt.show()
+    plt.show(*args)
 
 def tick_format(locale = True, useMathText=True, style = '', scilimits = None, **kargs):
     plt.ticklabel_format(useLocale=locale, style=style, scilimits=scilimits, useMathText=useMathText, **kargs)
