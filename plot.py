@@ -192,7 +192,11 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
             lugar = lugar + f'({i})'
     if xlogscale:
         if auto_tick_format: print("WARNING: auto_tick_format no es compatible con logscale. Se ha desactivado automaticamente")
-    if auto_tick_format and not xlogscale: tick_format()
+    if auto_tick_format and not xlogscale: 
+        try:
+            tick_format()
+        except AttributeError:
+            print("WARNING: auto_tick_format no funciona en plots polares y se desactiva por defecto")
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
     notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
