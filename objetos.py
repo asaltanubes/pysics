@@ -177,6 +177,16 @@ class Medida:
             else:
                 raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
             
+        def tabla_typst(self):
+            """Igual que tabla pero en math mode"""
+            if len(self._medida) == 1:
+                m = self._medida[0]
+                e = self._error[0]
+                if e == 0:
+                    return "$" + str(m)+ "$"
+                return f'${m} '.replace('.', ',') +  r"plus.minus" + f' {e}$'.replace('.', ',')
+            else:
+                raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
 
 # -----------------------------------------------------------------------------
     def __abs__(self):

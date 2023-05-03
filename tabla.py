@@ -37,3 +37,13 @@ def latex(datos: list, cabecera: Opcional[list] = None, caption: str = 'Caption'
     tabular = f'\t \\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + '\t\\end{tabular}'
     table = '\\begin{table}[ht]\n \\centering \n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\n' + tabular + '\n\n' + '\\end{table}'
     return table
+
+def typst(datos: list, cabecera: Opcional[list] = None, transponer: bool = False):
+    datos = create_table_list(datos, cabecera, transponer, estilo=Medida.Estilo.tabla_typst)
+    datos = [[f'[{i}]' for i in j] for j in datos]
+    
+    tabular = '\n\t\t' + ', \n \t\t'.join(', '.join(i) for i in datos)
+    
+    ancho = max((len(i) for i in datos))
+    tabla = f"\t table(\n\t columns: {ancho}, \n\t align: center, {tabular} \n)"
+    return tabla
