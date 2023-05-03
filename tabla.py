@@ -35,5 +35,5 @@ def latex(datos: list, cabecera: Opcional[list] = None, caption: str = 'Caption'
     ancho = max((len(i) for i in datos))
     
     tabular = f'\t \\begin{"{"}tabular{"}"}{"{"}|{"|".join(["c"]*ancho)}|{"}"}\n' + tabular + '\n' + '\t\\end{tabular}'
-    table = '\\begin{table}[ht]\n \\centering \n\n' + tabular + '\n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\\end{table}'
+    table = '\\begin{table}[ht]\n \\centering \n\n' + '\\caption{' + caption + '}\n\\label{' + label + '}\n\n' + tabular + '\n\n' + '\\end{table}'
     return table
