@@ -184,7 +184,7 @@ class Medida:
                 e = self._error[0]
                 if e == 0:
                     return "$" + str(m)+ "$"
-                return f'${m} '.replace('.', ',') +  r"plus.minus" + f' {e}$'.replace('.', ',')
+                return f'${m} ' +  r"plus.minus" + f' {e}$'
             else:
                 raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
 

@@ -199,7 +199,7 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
             print("WARNING: auto_tick_format no funciona en plots polares y se desactiva por defecto")
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
-    notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
+    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
 def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
@@ -213,7 +213,7 @@ def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
         
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
-    notacion_cientifica(usar_notacion_cientifica and not notacion_cientifica, rango_sin_notacion_cientifica)
+    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
     plt.show(*args)
 
 def tick_format(locale = True, useMathText=True, style = '', scilimits = None, **kargs):
