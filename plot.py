@@ -40,7 +40,7 @@ def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', l
         x = x.x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
-def curva(funcion, x, coeficientes, log_linspace = False, label = None, **kargs):
+def curva(funcion, x, coeficientes, log_linspace = False, label = None, n=100, **kargs):
     # Coeficientes puede ser una medida o un iterable de medidas
     # En el primero cada coeficiente es el valor de cada medida.
     # En el segundo cada coeficiente es el primer valor de la medida
@@ -56,7 +56,7 @@ def curva(funcion, x, coeficientes, log_linspace = False, label = None, **kargs)
         if len(signature(funcion).parameters) == 2 or hasattr(coeficientes, '__iter__'):
             coeficientes = (coeficientes, )
             
-    x = linspace(min(x), max(x)) if not log_linspace else geomspace(min(x), max(x))
+    x = linspace(min(x), max(x), n) if not log_linspace else geomspace(min(x), max(x), n)
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)
 
@@ -141,10 +141,10 @@ def doble_x(*args, **kargs):
     A partir de la llamada a esta funcion se añaden los valores al segundo eje'''
     plt.twiny(*args, **kargs)
 
-def xlabel(text, fontsize = 12, **kargs):
+def xlabel(text, fontsize = 15, **kargs):
     plt.xlabel(text, fontsize = fontsize, **kargs)
 
-def ylabel(text, fontsize = 12, **kargs):
+def ylabel(text, fontsize = 15, **kargs):
     plt.ylabel(text, fontsize = fontsize, **kargs)
 
 def ticks(fontsize = 14, **kargs):
@@ -199,7 +199,7 @@ def guardar(lugar: str = 'figura', formato='pdf', sobrescribir = True, dpi = 'fi
             print("WARNING: auto_tick_format no funciona en plots polares y se desactiva por defecto")
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
-    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
+    if usar_notacion_cientifica: plt.ticklabel_format(style="sci", scilimits=rango_sin_notacion_cientifica)
     plt.savefig(f'{lugar}.{formato}', dpi=dpi, format = formato, **kargs)
 
 def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
@@ -213,7 +213,7 @@ def show(*args, auto_size = True, auto_tick_format = True, xlogscale = False):
         
     if auto_size: tight_layout()
     if xlogscale: plt.xscale("log")
-    notacion_cientifica(usar_notacion_cientifica, rango_sin_notacion_cientifica)
+    if usar_notacion_cientifica: plt.ticklabel_format(style="sci", scilimits=rango_sin_notacion_cientifica)
     plt.show(*args)
 
 def tick_format(locale = True, useMathText=True, style = '', scilimits = None, **kargs):
@@ -223,12 +223,12 @@ def set_notacion_cientifica(usar=usar_notacion_cientifica, rango=rango_sin_notac
     global rango_sin_notacion_cientifica, usar_notacion_cientifica
     usar_notacion_cientifica = usar
     rango_sin_notacion_cientifica = rango
-
-def notacion_cientifica(usar=True, rango = (0, 0)):
-    if usar: plt.ticklabel_format(style="sci", scilimits=rango)
     
 def use_latex(usar=True):
     plt.rc("text", usetex= usar)
 
 def use_latex_packages(*packages):
      plt.rc('text.latex', preamble="\n".join((r"\usepackage{" + i + "}" for i in packages)))
+    
+def add_latex_code(code):
+    plt.rc('text.latex', preamble="\n".join(code))
