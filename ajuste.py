@@ -15,7 +15,7 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
     if isinstance(x, Medida):
         x = x._medida
     if isinstance(y, Medida):
-        if hasattr(sigma, '__iter__'):
+        if sigma == True:
             sigma = y.error
         y = y._medida
         
@@ -24,12 +24,32 @@ def curva(funcion, x: elementos, y: elementos, sigma = None, initial_guess: list
         initial_guess = (initial_guess, )
     
     # Se comprueba que el número de parámetros sea el correcto
-    if initial_guess is not None and len(initial_guess) != len(signature(funcion).parameters) - 1:
+    if len(signature(funcion).parameters) > 1 and initial_guess is not None and len(initial_guess) != len(signature(funcion).parameters) - 1:
         raise TypeError(f'La longitud de "initial_guess" debe ser {len(signature(funcion).parameters)} se obtuvieron {len(initial_guess)} parametros')        
     
     popt, error = curve_fit(funcion, x, y, p0=initial_guess, sigma = sigma)
     # Se devuelve una tupla con las medidas obtenidas
     return tuple((Medida(v, e, aproximar=aproximar) for v, e in zip(popt, np.sqrt(np.diag(error)))))
+
+def r_curva(funcion, x, y, sigma = None, initial_guess=None, aproximar = False):
+    if isinstance(x, Medida):
+        x = x._medida
+    if isinstance(y, Medida):
+        if hasattr(sigma, '__iter__'):
+            sigma = y.error
+        y = y._medida
+        
+    if initial_guess is not None and len(initial_guess) != len(signature(funcion).parameters) - 1:
+        raise TypeError(f'La longitud de "initial_guess" debe ser {len(signature(funcion).parameters)} se obtuvieron {len(initial_guess)} parametros')    
+    
+    if  len(signature(funcion).parameters) - 1 > 0 and initial_guess is not None and not hasattr(initial_guess, '__iter__'):
+        initial_guess = (initial_guess, )
+    
+    popt, pcov = curve_fit(funcion, x, y)
+    residuals = y- funcion(x, *popt)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((y-np.mean(y))**2)
+    return np.sqrt(1 - (ss_res / ss_tot))
 
 def minimos_cuadrados(x: elementos, y: elementos, aproximar: bool = False) -> Recta:
     """
