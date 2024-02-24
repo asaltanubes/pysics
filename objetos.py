@@ -1,10 +1,8 @@
 from .aprox import aprox
 from .estadistica import media, desviacion_estandar, error_estandar
 import numpy as np
-from math import nan, ceil, floor
-import mpmath
+from math import nan
 from . import calculos
-
 
 # Markers para indexar en medidas
 VALOR = object()
@@ -26,18 +24,18 @@ def _tratar_error(medida, error):
             error = (error * len(medida))
     else:
                 error = [error]*len(medida)
-    return np.array([abs(Number(i)) for i in error])
+    return np.array([abs(i) for i in error])
 class Medida:
     """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
     (en una lista) y sus respectivos errores"""
-    def __init__(self, medida: list[float] or float, error: list[float] or float = None, aproximar: bool = True):
+    def __init__(self, medida: list[float], error: list[float] = None, aproximar: bool = True):
         if not isinstance(medida, Medida):
             error = 0 if error is None else error
             # Si no se pasa un iterable se convierte en uno
             if not hasattr(medida, '__iter__'):
                 medida = [medida]
             
-            self._medida = np.array([Number(i) for i in medida])
+            self._medida = np.array([i for i in medida])
             self._error  = _tratar_error(medida, error)
         else:
             medida = medida.copy()
@@ -107,18 +105,6 @@ class Medida:
     def estimacion(self):
         """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
         return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
-    
-    def rad(self):
-        '''Convierte a radianes desde grados'''
-        m = [n.rad() for n in self._medida]
-        e = [g.rad() for g in self._error]
-        return Medida(m, e, aproximar=False)
-    
-    def grad(self):
-        '''Convierte a grados desde radianes'''
-        m = [n.grad() for n in self._medida]
-        e = [g.grad() for g in self._error]
-        return Medida(m, e, aproximar=False)
 
     def sqrt(self):
         m = np.array([m.sqrt() for m in self._medida])
@@ -364,171 +350,6 @@ class Recta:
 
     def __repr__(self):
         return f'Recta( {self} )'
-    
-class Number:
-    def __init__(self, value):
-        if isinstance(value, Number):
-            self.value = value.value
-        elif isinstance(value, (int, float)):
-            value = str(value)
-            self.value = mpmath.mpf(value)
-        elif isinstance(value, str):
-            self.value = mpmath.mpf(value)
-        elif isinstance(value, mpmath.mpf):
-            self.value = value
-        elif type(value) == type(mpmath.mp.pi):
-            self.value = mpmath.mpf(value)
-        elif type(value).__module__ == np.__name__:
-            value = float(value)
-            self.value = mpmath.mpf(str(value))
-        elif isinstance(value, mpmath.mpc):
-            raise TypeError("Un número complejo salvaje ha aparecido, algo ha ido mal :/")
-        else: raise TypeError(f"Value not suported : {type(value)}")
-    
-    def sqrt(self):
-        return Number(self.value.sqrt())
-    
-    def exp(self):
-        return Number(mpmath.mp.exp(self.value))
-    
-    def log10(self):
-        return Number(mpmath.mp.log10(self.value))
-
-    def log(self):
-        return Number(mpmath.mp.ln(self.value))
-    
-    def sin(self):
-        return Number(mpmath.mp.sin(self.value, prec=mpmath.mp.prec+2))
-
-    def cos(self):
-        return Number(mpmath.mp.cos(self.value, prec=mpmath.mp.prec+2))
-
-    def tan(self):
-        return Number(mpmath.mp.tan(self.value, prec=mpmath.mp.prec+2))
-    
-    def asin(self):
-        return Number(mpmath.mp.asin(self.value, prec=mpmath.mp.prec+2))
-    
-    def acos(self):
-        return Number(mpmath.mp.acos(self.value, prec=mpmath.mp.prec+2))
-    
-    def atan(self):
-        return Number(mpmath.mp.atan(self.value, prec=mpmath.mp.prec+2))
-    
-    arcsin = asin
-    arccos = acos
-    arctan = atan
-     
-    def rad(self):
-        return Number(mpmath.radians(self.value))
-    
-    def grad(self):
-        return Number(mpmath.degrees(self.value))
-    
-    def __int__(self):
-        return int(self.value)
-
-    def __float__(self):
-        return float(self.value)
-
-    def __add__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fadd(self.value, other.value, prec=mpmath.mp.prec+2))
-    __radd__ = __add__
-    
-    def __sub__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fsub(self.value, other.value, prec=mpmath.mp.prec+2))
-    
-    def __rsub__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fsub(other.value, self.value, prec=mpmath.mp.prec+2))
-    
-    def __mul__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fmul(self.value, other.value, prec=mpmath.mp.prec+2))
-    __rmul__ = __mul__
-    
-    def __truediv__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fdiv(self.value, other.value, prec=mpmath.mp.prec+2))
-    def __rtruediv__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.fdiv(other.value, self.value, prec=mpmath.mp.prec+2))
-    
-    def __pow__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        if isinstance(other, (int, float)):
-            other = Number(other)
-        return Number(mpmath.power(self.value, other.value))
-    def __rpow__(self, other):
-        if not isinstance(other, Number):
-            other = Number(other)
-        return Number(mpmath.power(other.value, self.value))
-    
-    def __eq__(self, other):
-        # if not isinstance(other, (Number, int, float)):
-        #     raise TypeError(f"Unsuported operand type(s) for ==: Number and {type(other)}")
-        if isinstance(other, (int, float)):
-            other = Number(other)
-        return self.value == other.value
-        
-    def __lt__(self, other):
-        if isinstance(other, Number):
-            other = other.value
-        return self.value < other
-    
-    def __gt__(self, other):
-        if isinstance(other, Number):
-            other = other.value
-        return self.value > other
-    
-    def __le__(self, other):
-        if isinstance(other, Number):
-            other = other.value
-        return self.value <= other
-    
-    def __ge__(self, other):
-        if isinstance(other, Number):
-            other = other.value
-        return self.value >= other
-    
-    def __ne__(self, other):
-        if isinstance(other, Number):
-            other = other.value
-        return self.value != other
-    
-    def __neg__(self):
-        return Number(mpmath.fneg(self.value))
-    
-    def __abs__(self):
-        return Number(mpmath.fabs(self.value))
-    
-    def __round__(self, ndigits=0):
-        return Number(round(self.value, ndigits=ndigits))
-    
-    def __ceil__(self):
-        return Number(mpmath.ceil(self.value))
-    
-    def __floor__(self):
-        return Number(mpmath.floor(self.value))
-    
-    def __str__(self):
-        return mpmath.nstr(self.value, mpmath.mp.dps, min_fixed=-4, max_fixed=5)
-    
-    def __trunc__(self):
-        return Number(floor(self.value))
-
-    def __repr__(self):
-        return f"Number({mpmath.nstr(self.value, mpmath.mp.dps, min_fixed=-4, max_fixed=5)})"
-
 
 if __name__ == '__main__':
     # pass

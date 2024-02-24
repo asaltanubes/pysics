@@ -1,19 +1,15 @@
 import numpy as np
-from pysics.objetos import Medida, Number
+from pysics.objetos import Medida
 from mpmath import atan2 as mpatan2
 from mpmath import mp
 
 
 def rad(grados: Medida) -> Medida:
     """Transforma un ángulo a radianes"""
-    if isinstance(grados, (Number, Medida)):
-        return grados.rad()
     return grados * np.pi/180
 
 def grad(radianes: Medida):
     """Transforma un ángulo a grados"""
-    if isinstance(radianes, (Number, Medida)):
-        return radianes.grad()
     return radianes * 180/np.pi
 
 def sen(x: Medida) -> Medida:
@@ -130,7 +126,7 @@ def ln(x: Medida) -> Medida:
 
 def sqrt(x: Medida) -> Medida:
     """Raiz cuadrada"""
-    if not isinstance(x, (Medida, Number)):
+    if not isinstance(x, Medida):
         return x**(1/2)
     return x.sqrt()
     

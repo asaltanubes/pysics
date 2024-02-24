@@ -3,7 +3,7 @@ from math import trunc, isnan, isinf, nan
 from .type_alias import elementos
 from . import calculos
 
-def aprox(valor: list[float] or float, error: list[float] or float) -> tuple[float, float] or tuple[list[float], list[float]]:
+def aprox(valor: list[float], error: list[float]) -> tuple[list[float], list[float]]:
     """Aproxima un valor y su error a la primera cifra significativa del error (3.894 ± 0.26 -> 4.0 ± 0.3) o a las dos primeras si la primera es 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
        Si se pasan una lista de valores se aplica a cada pareja por separado
 

@@ -1,7 +1,4 @@
-from mpmath import mp
 from numpy import floor, ceil
-
-mp.dps = 60
 
 ROUND_UP = 1
 ROUND_DOWN = 2
@@ -21,10 +18,3 @@ def round(n, decimals=0, rounding = None):
         return floor(n*multiplier + 0.5) / multiplier
     else:
         return ceil(n*multiplier - 0.5) / multiplier
-
-def set_precision(prec):
-    """Cambia el número de posiciones decimales empleadas para realizar cálculos"""
-    mp.dps=prec
-
-def get_precision():
-    return mp.dps
