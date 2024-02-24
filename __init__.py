@@ -1,5 +1,5 @@
-from .objetos import Medida, Recta, VALOR, ERROR
-from .cargador import cargar
+from .objetos import Measure, Line, VALUE, ERROR
+from .cargador import load
 from .constantes import pi
 
 from . import ajuste

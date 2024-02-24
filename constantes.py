@@ -1,4 +1,2 @@
-from mpmath import mp
-
-pi  = mp.pi
-phi = mp.phi
+from numpy import pi
+from scipy.constants import *

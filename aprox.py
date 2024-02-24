@@ -1,6 +1,5 @@
 import numpy as np
 from math import trunc, isnan, isinf, nan
-from .type_alias import elementos
 from . import calculos
 
 def aprox(valor: list[float], error: list[float]) -> tuple[list[float], list[float]]:
@@ -65,7 +64,6 @@ def apr(valor: float, error: float) -> tuple[float, float]:
         return (0, error)
     if isinf(valor):
         return (valor, apr(1, error)[1])
-    a = truncar(error, -cifra_significativa(error))
     
     cifras_error = -cifra_significativa(error)
     a = truncar(error, cifras_error)

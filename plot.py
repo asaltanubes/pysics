@@ -1,43 +1,54 @@
 from matplotlib import pyplot as plt
 from os.path import exists
 from .ajuste import line as ajuste_linea
-from .objetos import Medida, Recta
-from .type_alias import elementos
+from .objetos import Measure, Line
 from numpy import linspace, geomspace
+from typing import Union
+import numpy as np
 import locale
 locale.setlocale(locale.LC_ALL, '')
 usar_notacion_cientifica = True
 rango_sin_notacion_cientifica = (-2, 2)
 
-def scatter(x: elementos, y: elementos, c: str = 'tab:red', relleno = True, marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, **kargs):
-    if isinstance(x, Medida):
-        x = x._medida
-    if isinstance(y, Medida):
-        y = y._medida
+def scatter(x: list[float], y: list[float], c: str = 'tab:red', relleno = True, marker: str = 'o', s: int = 50, label: str = None, zorder: int = 100, 
+            xerr: list[float]=None, yerr: list[float] = None, errorbarcolor = "tab:red", barzorder = 0, **kargs):
+    
+    if isinstance(x, Measure):
+        if xerr == True:
+            xerr = x.error
+
+    if isinstance(y, Measure):
+        if yerr == True:
+            yerr = y.error
+    
+    x = np.array(x)
+    y = np.array(y)
+
+    if xerr is not None or yerr is not None:
+        plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, zorder = barzorder)
+
     facecolors = 'none' if not relleno else c
     plt.scatter(x, y, s=s, marker = marker, facecolors = facecolors, edgecolors = c, label=label, zorder = zorder, **kargs)
 
 
-def plot(x: elementos, y: elementos, label=None, **kargs):
-    if isinstance(x, Medida):
-        x = x._medida
-    if isinstance(y, Medida):
-        y = y._medida
-    if isinstance(y, Recta):
-        y = ajuste_linea(x, y)
+def plot(x: list[float], y: list[float], label=None, **kargs):
+
+    x = np.array(x) 
+    y = np.array(y)
+    
     plt.plot(x, y, label = label, **kargs)
 
 
-def line(x: elementos, pen: Medida or float or Recta=0, n_0=0, c = 'tab:blue', label=None, **kargs):
-    if isinstance(x, Medida):
+def line(x: Union[list[float], Line], pen: Union[Measure, float, Line]=0, n_0=0, c = 'tab:blue', label=None, **kargs):
+    if isinstance(x, Measure):
         x = x._medida
-    if isinstance(pen, Recta):
+    if isinstance(pen, Line):
         n_0 = pen.n_0
-        pen = pen.pendiente
-    if isinstance(x, Recta):
-        pen = x.pendiente
+        pen = pen.slope
+    if isinstance(x, Line):
+        pen = x.slope
         n_0 = x.n_0
-        x = x.x._medida
+        x = x._medida
     plt.plot(x, ajuste_linea(x, pen, n_0), c=c, label=label, **kargs)
 
 def curva(funcion, x, coeficientes, log_linspace = False, label = None, n=100, **kargs):
@@ -45,11 +56,11 @@ def curva(funcion, x, coeficientes, log_linspace = False, label = None, n=100, *
     # En el primero cada coeficiente es el valor de cada medida.
     # En el segundo cada coeficiente es el primer valor de la medida
     # Si solo hay un coeficiente se toma como coeficiente singular
-    if isinstance(coeficientes, Medida):
-        coeficientes = coeficientes.medida
+    if isinstance(coeficientes, Measure):
+        coeficientes = coeficientes.value
         
     if hasattr(coeficientes, '__iter__'):
-        if isinstance(coeficientes[0], Medida):
+        if isinstance(coeficientes[0], Measure):
             coeficientes = [i.medida[0] for i in coeficientes]
     else:
         from inspect import signature
@@ -60,10 +71,10 @@ def curva(funcion, x, coeficientes, log_linspace = False, label = None, n=100, *
     y = [funcion(i, *coeficientes) for i in x]
     plot(x, y, label, **kargs)
 
-def polar_plot(theta: elementos, r: elementos, label=None,  **kargs):
-    if isinstance(theta, Medida):
+def polar_plot(theta: list[float], r: list[float], label=None,  **kargs):
+    if isinstance(theta, Measure):
         theta = theta._medida
-    if isinstance(r, Medida):
+    if isinstance(r, Measure):
         r = r._medida
     plt.polar(theta, r, label=label, **kargs)
 
@@ -72,11 +83,11 @@ def polar_scatter(theta, r, c: str = 'tab:red', relleno = True, marker: str = 'o
     polar_plot(theta, r, marker=marker, markerfacecolor= facecolors, markeredgecolor=c, linestyle='None', markersize=s, label=label, zorder=zorder, **kargs)
     
 def polar_curva(funcion, theta, coeficientes, label=None, **kargs):
-    if isinstance(coeficientes, Medida):
+    if isinstance(coeficientes, Measure):
         coeficientes = coeficientes.medida
         
     if hasattr(coeficientes, '__iter__'):
-        if isinstance(coeficientes[0], Medida):
+        if isinstance(coeficientes[0], Measure):
             coeficientes = [i.medida[0] for i in coeficientes]
     else:
         from inspect import signature
@@ -87,25 +98,25 @@ def polar_curva(funcion, theta, coeficientes, label=None, **kargs):
     r = [funcion(i, *coeficientes) for i in theta]
     polar_plot(theta, r, label=label, **kargs)
 
-def hollow_errorbar(x: elementos, y: elementos, yerr = None, xerr = None, dotcolor = 'tab:blue', puntos_rellenos = True, marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
-    if isinstance(x, Medida):
+def hollow_errorbar(x: list[float], y: list[float], yerr = None, xerr = None, dotcolor = 'tab:blue', puntos_rellenos = True, marker = 'o', s = 50, errorbarcolor = 'tab:red', barzorder = 0, dotzorder = 100, label=None):
+    if isinstance(x, Measure):
         if xerr == None:
             xerr = x.error
         x = x.medida
-    if isinstance(y, Medida):
+    if isinstance(y, Measure):
         if yerr == None:
             yerr = y.error
         y = y.medida
-    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', zorder = barzorder)
+    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, zorder = barzorder)
     facecolor = 'none' if not puntos_rellenos else dotcolor
     plt.scatter(x, y, s=s, marker = marker, c = facecolor, edgecolors = dotcolor, label=label, zorder = dotzorder)
 
-def errorbar(x: elementos, y: elementos, yerr=None, xerr = None, errorbarcolor = 'tab:red', **kargs):
-    if isinstance(x, Medida):
+def errorbar(x: list[float], y: list[float], yerr=None, xerr = None, errorbarcolor = 'tab:red', **kargs):
+    if isinstance(x, Measure):
         if xerr == None:
             xerr = x.error
         x = x.medida
-    if isinstance(y, Medida):
+    if isinstance(y, Measure):
         if yerr == None:
             yerr = y.error
         y = y.medida

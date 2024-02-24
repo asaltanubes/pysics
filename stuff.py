@@ -1,4 +1,4 @@
-from .objetos import Medida, VALOR, ERROR
+from .objetos import Measure, VALUE, ERROR
 from .constantes import pi
 from .func import *
 from . import plot

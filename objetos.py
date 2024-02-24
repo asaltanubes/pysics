@@ -1,50 +1,48 @@
 from .aprox import aprox
-from .estadistica import media, desviacion_estandar, error_estandar
+from .estadistica import mean, standard_deviation, standard_error
 import numpy as np
 from math import nan
 from . import calculos
 
-# Markers para indexar en medidas
-VALOR = object()
+# Markers para indexar en values
+VALUE = object()
 ERROR = object()
 
-
-def _tratar_error(medida, error):
+def _get_error(value, error):
     '''
-    Convierte un error pasado a una medida en un error que la medida puede manejar
+    Convierte un error pasado a una value en un error que la value puede manejar
     El tipo debe ser np.ndarray[Number]. Si se pasa un solo valor a la función se
-    toma como un error constante para toda la medida
+    toma como un error constante para toda la value
     '''
     
     if hasattr(error, '__iter__'):
-        if not len(medida) == len(error):
+        if not len(value) == len(error):
             if len(error) != 1:
                 raise ValueError(
-                "No hay el mismo número de medidas que de errores o no es un error constante")
-            error = (error * len(medida))
+                "No hay el mismo número de values que de errores o no es un error constante")
+            error = (error * len(value))
     else:
-                error = [error]*len(medida)
+                error = [error]*len(value)
     return np.array([abs(i) for i in error])
-class Medida:
-    """Objeto básico para guardar medidas. Se le puede dar una o varias medidas
+class Measure:
+    """Objeto básico para guardar values. Se le puede dar una o varias values
     (en una lista) y sus respectivos errores"""
-    def __init__(self, medida: list[float], error: list[float] = None, aproximar: bool = True):
-        if not isinstance(medida, Medida):
+    def __init__(self, value: list[float], error: list[float] = None, aproximar: bool = True):
+        if not isinstance(value, Measure):
             error = 0 if error is None else error
             # Si no se pasa un iterable se convierte en uno
-            if not hasattr(medida, '__iter__'):
-                medida = [medida]
+            if not hasattr(value, '__iter__'):
+                value = [value]
             
-            self._medida = np.array([i for i in medida])
-            self._error  = _tratar_error(medida, error)
+            self._value = np.array([i for i in value])
+            self._error  = _get_error(value, error)
         else:
-            medida = medida.copy()
-            self._medida = medida._medida
+            value = value.copy()
+            self._value = value._value
             if error is None:
-                self._error = medida._error
+                self._error = value._error
             else:
-                self._error = _tratar_error(medida._medida, error)
-                
+                self._error = _get_error(value._value, error)
                 
         if aproximar:
             self.aprox()
@@ -53,65 +51,65 @@ class Medida:
     @classmethod
     def from_pairs(self, *args, aproximar=False):
         '''
-            Dado un grupo de parejas de valores con sus errores devuelve la medida correspondiente
+            Dado un grupo de parejas de valores con sus errores devuelve la value correspondiente
         '''
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
         return self([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
 
     @property
-    def medida(self):
-        return [float(i) for i in self._medida]
+    def value(self):
+        return [float(i) for i in self._value]
     
     @property
     def error(self):
         return [float(i) for i in self._error]
 
     def unpack(self) -> tuple[list[float], list[float]]:
-        """Devuelve una tupla con la(s) medida(s) y su(s) error(es)"""
-        return list(self._medida), list(self._error)
+        """Devuelve una tupla con la(s) value(s) y su(s) error(es)"""
+        return list(self._value), list(self._error)
 
-    def lista_de_medidas(self):
-        """Devuelve una lista con los valores contenidos como medidas individuales"""
-        return [Medida(*i, aproximar=False).cambia_estilo(self.__print_style) for i in zip(self._medida, self._error)]
+    def list_of_values(self):
+        """Devuelve una lista con los valores contenidos como values individuales"""
+        return [Measure(*i, aproximar=False).cambia_estilo(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self):
-        """Retorna una copia INDEPENDIENTE de si misma. Todos los punteros a los datos son distintos"""
-        # los list son para hacer que las listas sean independientes
-        return Medida(list(self._medida), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
+        """Retorna una copia INDEslope de si misma. Todos los punteros a los datos son distintos"""
+        # los list son para hacer que las listas sean indeslopes
+        return Measure(list(self._value), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
 
     def aprox(self, decimales = None):
-        """Aproxima los valores de la medida"""
+        """Aproxima los valores de la value"""
         if decimales is None:
-            self._medida, self._error = aprox(self._medida, self._error)
+            self._value, self._error = aprox(self._value, self._error)
         else:
-            self._medida = np.array([calculos.round(i, decimales) for i in self._medida])
+            self._value = np.array([calculos.round(i, decimales) for i in self._value])
             self._error = np.array([calculos.round(i, decimales) for i in self._error])
             
         return self
 
-    def media(self) -> float:
+    def mean(self) -> float:
         """Calcula la media de los valores"""
-        return float(media(*self._medida))
+        return float(mean(*self._value))
 
-    def desviacion_estandar(self) -> float:
-        """Calcula la desviación estandar de los valores de la medida"""
-        return float(desviacion_estandar(*self._medida))
+    def standard_deviation(self) -> float:
+        """Calcula la desviación estandar de los valores de la value"""
+        return float(standard_deviation(*self._value))
 
-    def error_estandar(self) -> float:
-        """Calcula el error estandar de los valores de la medida (desviación estandar de la media)"""
-        return float(error_estandar(*self._medida))
+    def standard_error(self) -> float:
+        """Calcula el error estandar de los valores de la value (desviación estandar de la media)"""
+        return float(standard_error(*self._value))
 
-    def estimacion(self):
-        """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
-        return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
+    def estimation(self):
+        """Calcula la media de los valores de la value y el error de esta sumando en cuadratura el error estandar y el error"""
+        return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
 
     def sqrt(self):
-        m = np.array([m.sqrt() for m in self._medida])
+        m = np.array([m.sqrt() for m in self._value])
         e = 1/(2*m)*self._error
-        return Medida(m, e, aproximar=False)
+        return Measure(m, e, aproximar=False)
 
-    def cambia_estilo(self, estilo):
+    def cambia_style(self, estilo):
         """Cambia el estilo actual por otro"""
         if estilo in self.Estilo.__dict__.values():
             self.__print_style = estilo
@@ -119,137 +117,137 @@ class Medida:
         else:
             raise TypeError(f'El estilo {estilo} no es un estilo válido')
 
-    class Estilo:
-        """Clase conteninendo las diferentes funciones que representan la clase medida"""
-        def lista(self):
-            """[medidas] ± [errores]"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
+    class Style:
+        """Clase conteninendo las diferentes funciones que representan la clase value"""
+        def list(self):
+            """[values] ± [errores]"""
+            if len(self._value) == 1:
+                m = self._value[0]
                 e = self._error[0]
             else:
-                m = [str(i) for i in self._medida]
+                m = [str(i) for i in self._value]
                 e = [str(i) for i in self._error]
             return f'{m} ± {e}'
 
         def pm(self):
-            """medida 1 ± error 1, medida2 ± error 2, ..."""
+            """value 1 ± error 1, value2 ± error 2, ..."""
             l = []
-            for m, e in zip(self._medida, self._error):
+            for m, e in zip(self._value, self._error):
                 l.append(f'{m} ± {e}')
             return ', '.join(l)
         
         def a(self):
             return 'datos'
 
-        def tabla(self):
-            """Igual que pm pero solo funciona con una medida de longitud 1 por razones de debug"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
+        def table(self):
+            """Igual que pm pero solo funciona con una value de longitud 1 por razones de debug"""
+            if len(self._value) == 1:
+                m = self._value[0]
                 e = self._error[0]
                 if e == 0:
                     return str(m)
                 return f'{m} ± {e}'
             else:
-                raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
 
-        def tabla_latex(self):
+        def latex_table(self):
             """Igual que tabla pero en math mode"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
+            if len(self._value) == 1:
+                m = self._value[0]
                 e = self._error[0]
                 if e == 0:
                     return "$" + str(m)+ "$"
                 return f'${m} ' +  r"\pm" + f' {e}$'
             else:
-                raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
             
-        def tabla_typst(self):
+        def typst_table(self):
             """Igual que tabla pero en math mode"""
-            if len(self._medida) == 1:
-                m = self._medida[0]
+            if len(self._value) == 1:
+                m = self._value[0]
                 e = self._error[0]
                 if e == 0:
                     return "$" + str(m)+ "$"
                 return f'${m} ' +  r"plus.minus" + f' {e}$'
             else:
-                raise ValueError('La medida solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
 
 # -----------------------------------------------------------------------------
     def __abs__(self):
-        return Medida(abs(self._medida), self._error)
+        return Measure(abs(self._value), self._error)
     
     
     def __add__(self, other):
-        if not isinstance(other, Medida):
-            other = Medida(other)
-        return Medida(self._medida + other._medida, np.sqrt(self._error**2 + other._error**2), aproximar = False)
+        if not isinstance(other, Measure):
+            other = Measure(other)
+        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximar = False)
 
     def __radd__(self, other):
         return self + other
 
     def __sub__(self, other):
-        if not isinstance(other, Medida):
-            other = Medida(other)
-        return Medida(self._medida - other._medida, np.sqrt(self._error**2 + other._error**2), aproximar = False)
+        if not isinstance(other, Measure):
+            other = Measure(other)
+        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximar = False)
 
     def __rsub__(self, other):
         return -self + other
 
     def __mul__(self, other):
         # Si es un escalar
-        if not isinstance(other, Medida):
-            medida = self._medida * other
+        if not isinstance(other, Measure):
+            value = self._value * other
             error = self._error * abs(other)
         else:
-            medida = self._medida*other._medida
-            error = np.sqrt(np.array( (other._medida * self._error)**2 + (self._medida * other._error)**2 ))
+            value = self._value*other._value
+            error = np.sqrt(np.array( (other._value * self._error)**2 + (self._value * other._error)**2 ))
 
-        return Medida(medida, error, aproximar = False)
+        return Measure(value, error, aproximar = False)
 
     def __rmul__(self, val):
-        return Medida(val * self._medida, abs(val) * self._error, aproximar = False)
+        return Measure(val * self._value, abs(val) * self._error, aproximar = False)
 
     def __truediv__(self, other):
         # Si es un escalar
-        if not isinstance(other, Medida):
-            medida = self._medida/other
+        if not isinstance(other, Measure):
+            value = self._value/other
             error = self._error/abs(other)
         else:
-            medida = self._medida/other._medida
-            error = np.sqrt(np.array( (1/other._medida * self._error)**2
-                            + (self._medida/other._medida**2 * other._error)**2 ))
-        return Medida(medida, error, aproximar = False)
+            value = self._value/other._value
+            error = np.sqrt(np.array( (1/other._value * self._error)**2
+                            + (self._value/other._value**2 * other._error)**2 ))
+        return Measure(value, error, aproximar = False)
 
     def __rtruediv__(self, other):
-        return Medida(other/self._medida, abs(other/self._medida**2) * self._error, aproximar = False)
+        return Measure(other/self._value, abs(other/self._value**2) * self._error, aproximar = False)
 
     def __pow__(self, other):
-        medida = self._medida**other
-        error = abs((other)*self._medida**(other-1))*self._error
-        return Medida(medida, error, aproximar = False)
+        value = self._value**other
+        error = abs((other)*self._value**(other-1))*self._error
+        return Measure(value, error, aproximar = False)
 
     def __and__(self, other):
-        return Medida(self._medida + other._medida, self._error + other._error, aproximar = False)
+        return Measure(self._value + other._value, self._error + other._error, aproximar = False)
 
     def __or__(self, other):
         return self & -other
 
     def __eq__(self, other):
-        if not isinstance(other, Medida):
-            raise TypeError(f"Unsuported operand type(s) for ==: Medida and {type(other)}")
-        return self.media == other.medida and self.error == other.error
+        if not isinstance(other, Measure):
+            raise TypeError(f"Unsuported operand type(s) for ==: Measure and {type(other)}")
+        return self.media == other.value and self.error == other.error
         
     def __len__(self):
-        return len(self._medida)
+        return len(self._value)
 
     def __getitem__(self, index):
         if not hasattr(index, '__getitem__'):
-            return Medida(self._medida[index], self._error[index], aproximar=False)
+            return Measure(self._value[index], self._error[index], aproximar=False)
         
         indice_deseado = index[0]
         valor_o_error = index[1]
-        if valor_o_error is VALOR:
-            return self._medida[indice_deseado]
+        if valor_o_error is VALUE:
+            return self._value[indice_deseado]
         elif valor_o_error is ERROR:
             return self._error[indice_deseado]
         raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")    
@@ -258,39 +256,39 @@ class Medida:
         if hasattr(index, "__getitem__"):
             indice = index[0]
             valor_o_error = index[1]
-            value = Medida(value)
+            value = Measure(value)
             if type(indice) == slice:
-                if valor_o_error is VALOR:
-                    self._medida[indice] = value._medida
+                if valor_o_error is VALUE:
+                    self._value[indice] = value._value
                 elif valor_o_error is ERROR:
-                    self._error[indice] = value._medida
-                else: raise Exception("No se ha especificado si se debe actualizar medida o error")
-                if len(self._medida) != len(self._error):
+                    self._error[indice] = value._value
+                else: raise Exception("No se ha especificado si se debe actualizar value o error")
+                if len(self._value) != len(self._error):
                     raise TypeError("El valor nuevo no llena todos los datos anteriores")
             else:
-                if valor_o_error is VALOR:
-                    self._medida[indice] = value._medida[0]
+                if valor_o_error is VALUE:
+                    self._value[indice] = value._value[0]
                 elif valor_o_error is ERROR:
-                    self._error[indice] = value._medida[0]
-                else: raise Exception("No se ha especificado si se debe actualizar medida o error")
-                if len(self._medida) != len(self._error):
+                    self._error[indice] = value._value[0]
+                else: raise Exception("No se ha especificado si se debe actualizar value o error")
+                if len(self._value) != len(self._error):
                     raise TypeError("El valor nuevo no llena todos los datos anteriores")
         else:
             if type(index) == slice:
-                if isinstance(value, Medida):
-                    self._medida[index] = value._medida
+                if isinstance(value, Measure):
+                    self._value[index] = value._value
                     self._error[index] = value._error
                 if hasattr(value, "__getitem__"):
-                    value = Medida(value[0], value[1])
-                    self._medida[index] = value._medida
+                    value = Measure(value[0], value[1])
+                    self._value[index] = value._value
                     self._error[index] = value._error
             else:
-                if isinstance(value, Medida):
-                    self._medida[index] = value._medida[0]
+                if isinstance(value, Measure):
+                    self._value[index] = value._value[0]
                     self._error[index] = value._error[0]
                 if hasattr(value, "__getitem__"):
-                    value = Medida(value[0], value[1])
-                    self._medida[index] = value._medida[0]
+                    value = Measure(value[0], value[1])
+                    self._value[index] = value._value[0]
                     self._error[index] = value._error[0]
             
     def __neg__(self):
@@ -300,41 +298,37 @@ class Medida:
         return self.__print_style(self)
 
     def __repr__(self):
-        return "Medida( " + str(self) + " )"
+        return "Measure( " + repr(self) + " )"
     
     def __iter__(self):
-        return (float(i) for i in self.medida)
+        return (float(i) for i in self.value)
 
-
-class Recta:
-    '''Objeto que representa una recta, contiene dos medidas, una para la ordenada en el origen y otra para la
-    pendiente de la recta. Pueden obtenerse desestructurandola al igual que una tupla (pendiente, n_0)'''
-    def __init__(self, pendiente=0, n_0=0, x=[]):
-        self.pendiente = Medida(pendiente, aproximar = False)
-        self.n_0 = Medida(n_0, aproximar = False)
-        if not isinstance(x, Medida):
-            self.x = Medida(x)
-        else:
-            self.x = x
+class Line:
+    '''Objeto que representa una recta, contiene dos values, una para la ordenada en el origen y otra para la
+    slope de la recta. Pueden obtenerse desestructurandola al igual que una tupla (slope, n_0)'''
+    def __init__(self, slope=0, n_0=0, x=[]):
+        self.slope = Measure(slope, aproximar = False)
+        self.n_0 = Measure(n_0, aproximar = False)
+        self.x = Measure(x)
 
     def aprox(self):
-        self.pendiente.aprox()
+        self.slope.aprox()
         self.n_0.aprox()
         return self
 
     def copy(self):
-        return Recta(self.pendiente.copy(), self.n_0.copy())
+        return Line(self.slope.copy(), self.n_0.copy())
 
-    def corte(self, other):
+    def intersection(self, other):
         """Punto de corte con otra recta"""
-        if not isinstance(other, Recta):
-            other = Recta(0, other)
-        delta_p = self.pendiente - other.pendiente
+        if not isinstance(other, Line):
+            other = Line(0, other)
+        delta_p = self.slope - other.slope
         delta_n = other.n_0 - self.n_0
         if delta_p == 0:
             return nan
         x = delta_n/delta_p
-        y = self.pendiente * x + self.n_0
+        y = self.slope * x + self.n_0
         return (x, y)
 
     def plot(self, c = 'tab:blue', label=None, **kargs):
@@ -343,10 +337,10 @@ class Recta:
         return self
 
     def __iter__(self):
-        return (i for i in (self.pendiente, self.n_0))
+        return (i for i in (self.slope, self.n_0))
 
     def __str__(self):
-        return f'y = ({self.pendiente}) x + ({self.n_0})'
+        return f'y = ({self.slope}) x + ({self.n_0})'
 
     def __repr__(self):
         return f'Recta( {self} )'
@@ -354,7 +348,7 @@ class Recta:
 if __name__ == '__main__':
     # pass
     print()
-    m = Medida([353.72, 1532.6, 632], [2.56, 1, 1])
+    m = Measure([353.72, 1532.6, 632], [2.56, 1, 1])
     print(f'm -> {m}')
-    m.cambia_estilo(Medida.Estilo.lista)
+    m.cambia_estilo(Measure.Estilo.lista)
     print(m)
