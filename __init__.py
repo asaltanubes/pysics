@@ -1,15 +1,15 @@
-from .objetos import Measure, Line, VALUE, ERROR
-from .cargador import load
-from .constantes import pi
+from .objects import Measure, Line, VALUE, ERROR
+from .reader import load
+from .constants import pi
 
-from . import ajuste
+from . import fit
 from . import aprox
-from . import cargador
+from . import reader
 from . import estadistica
 from . import func
-from . import objetos
+from . import objects
 from . import plot
-from . import tabla
+from . import tables
 from . import calculos
-from . import constantes
-from . import stuff
+from . import constants
+from . import prelude
