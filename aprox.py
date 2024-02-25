@@ -2,90 +2,96 @@ import numpy as np
 from math import trunc, isnan, isinf, nan
 from . import calculos
 
-def aprox(valor: list[float], error: list[float]) -> tuple[list[float], list[float]]:
-    """Aproxima un valor y su error a la primera cifra significativa del error (3.894 ± 0.26 -> 4.0 ± 0.3) o a las dos primeras si la primera es 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
-       Si se pasan una lista de valores se aplica a cada pareja por separado
+def aprox(value: list[float], error: list[float]) -> tuple[list[float], list[float]]:
+    """
+    Aproximate a value and its error to the first significant figure of the error (3.894 ± 0.26 -> 4.0 ± 0.3) or to the first two if the first is 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
+    If a list of values is passed, it is applied to each pair separately
 
     Args:
-        valor (list[float]orfloat): valor/es a aproximar
-        error (list[float]orfloat): error/es de las medidas
+        value (list[float]orfloat): value/s to approximate
+        error (list[float]orfloat): error/s of the measures
 
     Returns:
-        tuple[float, float] or tuple[list[float], list[float]]: (valor/es, error/es) devuleve el valor/es y el/los error/es aproximados
+        tuple[float, float] or tuple[list[float], list[float]]: (value/s, error/s) returns the value/s and the/los error/s approximated
     """
-    # Si error no es un objeto iterable entonces se aplica la versión que no itera. Si es iterable entonces aplica la version que itera
-    if not hasattr(valor, '__iter__'):
-        return apr(valor, error)
-    p = apr_list(valor, error)
+    # If error is not an iterable object then the version that does not iterate is applied. If it is iterable then the version that iterates is applied
+    if not hasattr(value, '__iter__'):
+        return apr(value, error)
+    p = apr_list(value, error)
     return p
 
-def truncar(numero: float, digitos: int) -> float:
-    """Trunca un valor con n digitos donde n es el número de digitos tras el "." 
-        ejemplos(truncar(10.93, 1) -> 10.9; truncar(10.935, 2) -> 10.93; truncar(10.720, 0) -> 10; truncar(11.111, -1) -> 10)
-
-    Args:
-        numero (float): valor a truncar
-        digitos (int): número de digitos a coger tras el .
-
-    Returns:
-        float: valor truncado
+def truncate(number: float, digits: int) -> float:
     """
-    stepper = 10**digitos
-    return trunc(stepper*float(numero))/stepper
-
-def cifra_significativa(num: float) -> int:
-    """Calcula la posición de la primera cifra significativa
-       Ejemplos: (5 -> 1; 11 -> 2; 123 -> 3; 0.001 -> -3)
-
+    Truncate a value with n digits where n is the number of digits after the "."
+    examples(truncate(10.93, 1) -> 10.9; truncate(10.935, 2) -> 10.93; truncate(10.720, 0) -> 10; truncate(11.111, -1) -> 10)
+    
     Args:
-        num (float): valor del que se desea conocer la cifra significativa
+        number (float): value to truncate
+        digits (int): number of digits to take after the .
 
     Returns:
-        int: posición de la cifra significativa (10**cifra_sinificativa tiene el mismo orden de magnitud que num)
+        float: truncated value
+    """
+    stepper = 10**digits
+    return trunc(stepper*float(number))/stepper
+
+def significative_figure(num: float) -> int:
+    """
+    Calculates the position of the first significant figure
+    Examples: (5 -> 1; 11 -> 2; 123 -> 3; 0.001 -> -3)
+
+    Args:
+        num (float): value of which you want to know the significant figure
+
+    Returns:
+        int: position of the significant figure (10**significative_figure has the same order of magnitude as num)
     """
     return np.floor(np.log10(abs(num)))
 
-def apr(valor: float, error: float) -> tuple[float, float]:
-    """Aproxima un valor y su error a la primera cifra significativa del error (3.894 ± 0.26 -> 4.0 ± 0.3) o a las dos primeras si la primera es 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
+def apr(value: float, error: float) -> tuple[float, float]:
+    """
+    Aproximate a value and its error to the first significant figure of the error (3.894 ± 0.26 -> 4.0 ± 0.3) or to the first two if the first is 1 (3.834 ± 0.169 -> 3.83 ± 0.17)
 
     Args:
-        valor (float): valor a aproximar
-        error (float): error de la medida
+        value (float): value to approximate
+        error (float): error of the measure
 
     Returns:
-        tuple[float, float]: (valor, error) devuleve el valor y el error aproximados
+        tuple[float, float]: (value, error) returns the value and the error approximated
     """
     
     if error == 0 or isnan(error):
-        return (valor, error)
-    if isnan(valor):
+        return (value, error)
+    if isnan(value):
         return (nan, apr(1, error)[1])
     if isinf(error):
         return (0, error)
-    if isinf(valor):
-        return (valor, apr(1, error)[1])
+    if isinf(value):
+        return (value, apr(1, error)[1])
     
-    cifras_error = -cifra_significativa(error)
-    a = truncar(error, cifras_error)
+    error_figures = -significative_figure(error)
+    a = truncate(error, error_figures)
     
-    # Si la primera cifra significativa es un 1
+    # If the first significant figure is 1
     if np.log10(a) == np.floor(np.log10(a)):
-        # Si al aproximar a la siguiente el resultado es 1 entonces se coge también la siguiente.
-        # compruebo si es menor que 2 por posibles errores de punto flotante. Odio la aritmética de punto flotante.
-        if calculos.round(error, cifras_error) < 2*10**(-cifras_error):
-            cifras_error += 1
-    return (calculos.round(valor, cifras_error), calculos.round(error, cifras_error))
+        # If when approximating to the next one the result is 1 then the next one is also taken.
+        # I check if it is less than 2 for possible floating point errors. I hate floating point arithmetic.
+        if calculos.round(error, error_figures) < 2*10**(-error_figures):
+            error_figures += 1
+    return (calculos.round(value, error_figures), calculos.round(error, error_figures))
 
-def apr_list(valor: list[float], error: list[float]) -> tuple[list[float], list[float]]:
-    """Aplica apr a una lista de valores y errores"""
-    if not isinstance(valor, np.ndarray):
-        valor = np.array(valor)
-    # Si error es un escalar se transforma en una lista de la misma longitud que valor
+def apr_list(value: list[float], error: list[float]) -> tuple[list[float], list[float]]:
+    """
+    Apply apr to a list of values and errors
+    """
+    if not isinstance(value, np.ndarray):
+        value = np.array(value)
+    # If error is a scalar, it is transformed into a list of the same length as value
     if not hasattr(error, '__iter__'):
-        error = np.array(error + 0*valor)
+        error = np.array(error + 0*value)
     vallist = []
     errlist = []
-    for i in zip(valor, error):
+    for i in zip(value, error):
         v, e = apr(*i)
         vallist.append(v)
         errlist.append(e)
@@ -94,28 +100,28 @@ def apr_list(valor: list[float], error: list[float]) -> tuple[list[float], list[
     return (vallist, errlist)
 
 # rip monstruosidad de función de aproximación larga vida a apr con logaritmos
-# def apr(valor, error):
+# def apr(value, error):
 #     if error == 0:
-#         return (valor, error)
-#     valor = float(valor)
+#         return (value, error)
+#     value = float(value)
 #     error = float(error)
 #     string_error = str('%f' % error)
 #
-#     valores_error = string_error.replace('.', '')
+#     valuees_error = string_error.replace('.', '')
 #
 #     cifra_significativa = 0
-#     ignored_valores = ['0', '1']
-#     while valores_error[cifra_significativa] in ignored_valores:
+#     ignored_valuees = ['0', '1']
+#     while valuees_error[cifra_significativa] in ignored_valuees:
 #         cifra_significativa += 1
-#         if valores_error[cifra_significativa-1] == '1':
+#         if valuees_error[cifra_significativa-1] == '1':
 #             break
-#         if cifra_significativa >=len(valores_error):
-#             if valores_error[-1] == '1':
+#         if cifra_significativa >=len(valuees_error):
+#             if valuees_error[-1] == '1':
 #                 cifra_significativa += 1
 #             break
 #     posición_punto = string_error.find('.') if '.' in string_error else len(string_error)
 #     calculos.round_pos = cifra_significativa - posición_punto + 1
-#     return (calculos.round(valor, calculos.round_pos), calculos.round(error, calculos.round_pos))
+#     return (calculos.round(value, calculos.round_pos), calculos.round(error, calculos.round_pos))
 
 if __name__ == '__main__':
     a = [8.365241, 935.27, 89523.68586583]

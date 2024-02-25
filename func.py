@@ -1,148 +1,163 @@
 import numpy as np
-from .objetos import Measure
+from .objects import Measure
 
-def rad(grados: Measure) -> Measure:
-    """Transforma un ángulo a radianes"""
-    return grados * np.pi/180
+def rad(degrees: Measure) -> Measure:
+    """
+    Transform an angle to radians
+    """
+    return degrees * np.pi/180
 
-def grad(radianes: Measure):
-    """Transforma un ángulo a grados"""
-    return radianes * 180/np.pi
+def grad(radians: Measure):
+    """
+    Transform an angle to degrees
+    """
+    return radians * 180/np.pi
 
-def sen(x: Measure) -> Measure:
-    """Calcula el seno de una value"""
+def sin(x: Measure) -> Measure:
+    """
+    Calculate the sine of a value
+    """
     if not isinstance(x, Measure):
         return np.sin(x)
     
-    valor = np.sin(x._value)
-    error = np.abs(np.cos(x._value))*x._error
+    value = np.sin(x.value)
+    error = np.abs(np.cos(x.value))*x.error
     
-    
-    null_values = [i for i, v in enumerate(valor) if v==1 or v==-1]
-    for i in null_values:
-        error[i] = np.abs(np.sin(x._value[i]+x._error[i])-np.sin(x._value[i]))
+    nullvalues = [i for i, v in enumerate(value) if v==1 or v==-1]
+    for i in nullvalues:
+        error[i] = np.abs(np.sin(x.value[i]+x.error[i])-np.sin(x.value[i]))
         
-    return Measure(valor, error, aproximar = False)
+    return Measure(value, error, aproximate = False)
 
 def cos(x: Measure) -> Measure:
-    """Calcula el coseno de una value"""
+    """
+    Calculate the cosine of a value
+    """
     if not isinstance(x, Measure):
         return np.cos(x)
     
-    valor = np.cos(x._value)
-    error = np.abs(np.sin(x._value))*x._error
+    value = np.cos(x.value)
+    error = np.abs(np.sin(x.value))*x.error
     
-    null_values = [i for i, v in enumerate(valor) if v==1 or v==-1]
+    nullvalues = [i for i, v in enumerate(value) if v==1 or v==-1]
     
-    for i in null_values:
-        error[i] = np.abs(np.cos(x._value[i]+x._error[i])-np.cos(x._value[i]))
+    for i in nullvalues:
+        error[i] = np.abs(np.cos(x.value[i]+x.error[i])-np.cos(x.value[i]))
     
-    return Measure(valor, error, aproximar = False)
+    return Measure(value, error, aproximate = False)
 
 def tan(x):
-    
     if not isinstance(x, Measure):
         x = Measure(x)
-    valor = np.tan(x._value)
-    error = (1+valor**2) * x._error
-    return Measure(valor, error, aproximar=False)
+    value = np.tan(x.value)
+    error = (1+value**2) * x.error
+    return Measure(value, error, aproximate=False)
 
 
 def asin(x):
-    
     x = Measure(x)
         
-    if not (1 in x._value or -1 in x._value):
-        valor = np.arcsin(x._value)
-        error = x._error/np.sqrt(1-np.power(x._value, 2))
+    if not (1 in x.value or -1 in x.value):
+        value = np.arcsin(x.value)
+        error = x.error/np.sqrt(1-np.power(x.value, 2))
     else: 
-        valor = np.zeros(len(x._value))
-        error = np.zeros(len(x._error))
-        for i, (v, e) in enumerate(zip(x._value, x._error)):
+        value = np.zeros(len(x.value))
+        error = np.zeros(len(x.error))
+        for i, (v, e) in enumerate(zip(x.value, x.error)):
             if v != 1 and v != -1:
-                valor[i] = np.arcsin(v)
+                value[i] = np.arcsin(v)
                 error[i] = e/np.sqrt(1-np.power(v, 2))
             else:
-                valor[i] = np.arcsin(v)
+                value[i] = np.arcsin(v)
                 error[i] = np.abs(np.arcsin(v-e)-v)
             
-    return Measure(valor, error, aproximar=False)
+    return Measure(value, error, aproximate=False)
 
 
 def acos(x):
     
     x = Measure(x)
         
-    if not (1 in x._value or -1 in x._value):
-        valor = np.arccos(x._value)
-        error = x._error/np.sqrt(1-np.power(x._value, 2))
+    if not (1 in x.value or -1 in x.value):
+        value = np.arccos(x.value)
+        error = x.error/np.sqrt(1-np.power(x.value, 2))
     else:
-        valor = np.zeros(len(x._value))
-        error = np.zeros(len(x._error))
-        for i, (v, e) in enumerate(zip(x._value, x._error)):
+        value = np.zeros(len(x.value))
+        error = np.zeros(len(x.error))
+        for i, (v, e) in enumerate(zip(x.value, x.error)):
             if v != 1 and v != -1:
-                valor[i] = np.arccos(v)
+                value[i] = np.arccos(v)
                 error[i] = e/np.sqrt(1-np.power(v, 2))
             else:
-                valor[i] = np.arccos(v)
+                value[i] = np.arccos(v)
                 d = v-e if v>0 else v+e
                 error[i] = np.abs(np.arccos(d)-np.arccos(v))
-    return Measure(valor, error, aproximar=False)
+    return Measure(value, error, aproximate=False)
 
 
 def atan(x):
     x = Measure(x)
-    valor = np.arctan(x._value)
-    error = x._error/(1+np.power(x._value, 2))
-    return Measure(valor, error, aproximar=False)
+    value = np.arctan(x.value)
+    error = x.error/(1+np.power(x.value, 2))
+    return Measure(value, error, aproximate=False)
 
 def atan2(x: Measure, y: Measure):
-    """Angulo de un punto en coordenadas polares"""
+    """
+    Angle of a point in polar coordinates
+    """
     x = Measure(x)
     y = Measure(y)
     
-    angulos = [np.arctan2(x, y) for x, y in zip(x._value, y._value)]
+    angles = [np.arctan2(x, y) for x, y in zip(x.value, y.value)]
     
-    error = np.sqrt((y._value*x._error)**2+(x._value*y._error)**2)/np.abs(x**2+y**2)
+    error = np.sqrt((y.value*x.error)**2+(x.value*y.error)**2)/np.abs(x**2+y**2)
     
-    return Measure(angulos, error, aproximar=False)
+    return Measure(angles, error, aproximate=False)
 
 def ln(x: Measure) -> Measure:
-    """Logaritmo natural"""
+    """
+    Calculate the natural logarithm of a value
+    """
     if not isinstance(x, Measure):
         return np.log(x)
     
-    valor = np.log(x._value)
-    error = abs(1/x._value)*x._error
-    return Measure(valor, error, aproximar = False)
+    value = np.log(x.value)
+    error = abs(1/x.value)*x.error
+    return Measure(value, error, aproximate = False)
 
 def sqrt(x: Measure) -> Measure:
-    """Raiz cuadrada"""
+    """
+    Calculate the square root of a value
+    """
     if not isinstance(x, Measure):
         return x**(1/2)
     return x.sqrt()
     
 def exp(x: Measure) -> Measure:
-    """Función exponencial (e**x)"""
+    """
+    Calculate the exponential of a value
+    """
     if not isinstance(x, Measure):
         return np.exp(x)
     
-    valor = np.exp(x._value)
-    error = abs(valor)*x._error
-    return Measure(valor, error, aproximar=False)
+    value = np.exp(x.value)
+    error = abs(value)*x.error
+    return Measure(value, error, aproximate=False)
 
 def delta(x: Measure) -> Measure:
-    """Devuelve x[n+1]-x[n] en una value"""
+    """
+    Calculate the difference between consecutive values in a measure
+    """
     if not isinstance(x, Measure):
         x = Measure(x)
 
-    valores = []
-    errores = []
+    values = []
+    errors = []
     for i, j in zip(x[1:].list_of_values(), x[:-1].list_of_values()):
         v = i-j
-        valores.append(v._value[0])
-        errores.append(v._error[0])
-    return Measure(valores, errores, aproximar=False)
+        values.append(v.value[0])
+        errors.append(v.error[0])
+    return Measure(values, errors, aproximate=False)
 
 if __name__ == '__main__':
     print(cos(acos(Measure(1, 0.1))))

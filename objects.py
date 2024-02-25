@@ -27,7 +27,7 @@ def _get_error(value, error):
 class Measure:
     """Objeto básico para guardar values. Se le puede dar una o varias values
     (en una lista) y sus respectivos errores"""
-    def __init__(self, value: list[float], error: list[float] = None, aproximar: bool = True):
+    def __init__(self, value: list[float], error: list[float] = None, aproximate: bool = True):
         if not isinstance(value, Measure):
             error = 0 if error is None else error
             # Si no se pasa un iterable se convierte en uno
@@ -44,18 +44,18 @@ class Measure:
             else:
                 self._error = _get_error(value._value, error)
                 
-        if aproximar:
+        if aproximate:
             self.aprox()
         self.__print_style = self.Estilo.pm
 
     @classmethod
-    def from_pairs(self, *args, aproximar=False):
+    def from_pairs(self, *args, aproximate=False):
         '''
             Dado un grupo de parejas de valores con sus errores devuelve la value correspondiente
         '''
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
-        return self([i[0] for i in args], [i[1] for i in args], aproximar=aproximar)
+        return self([i[0] for i in args], [i[1] for i in args], aproximate=aproximate)
 
     @property
     def value(self):
@@ -71,12 +71,12 @@ class Measure:
 
     def list_of_values(self):
         """Devuelve una lista con los valores contenidos como values individuales"""
-        return [Measure(*i, aproximar=False).cambia_estilo(self.__print_style) for i in zip(self._value, self._error)]
+        return [Measure(*i, aproximate=False).cambia_estilo(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self):
         """Retorna una copia INDEslope de si misma. Todos los punteros a los datos son distintos"""
         # los list son para hacer que las listas sean indeslopes
-        return Measure(list(self._value), list(self._error), aproximar=False).cambia_estilo(self.__print_style)
+        return Measure(list(self._value), list(self._error), aproximate=False).cambia_estilo(self.__print_style)
 
     def aprox(self, decimales = None):
         """Aproxima los valores de la value"""
@@ -102,12 +102,12 @@ class Measure:
 
     def estimation(self):
         """Calcula la media de los valores de la value y el error de esta sumando en cuadratura el error estandar y el error"""
-        return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
+        return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximate = False)
 
     def sqrt(self):
         m = np.array([m.sqrt() for m in self._value])
         e = 1/(2*m)*self._error
-        return Measure(m, e, aproximar=False)
+        return Measure(m, e, aproximate=False)
 
     def cambia_style(self, estilo):
         """Cambia el estilo actual por otro"""
@@ -180,7 +180,7 @@ class Measure:
     def __add__(self, other):
         if not isinstance(other, Measure):
             other = Measure(other)
-        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximar = False)
+        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False)
 
     def __radd__(self, other):
         return self + other
@@ -188,7 +188,7 @@ class Measure:
     def __sub__(self, other):
         if not isinstance(other, Measure):
             other = Measure(other)
-        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximar = False)
+        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False)
 
     def __rsub__(self, other):
         return -self + other
@@ -202,10 +202,10 @@ class Measure:
             value = self._value*other._value
             error = np.sqrt(np.array( (other._value * self._error)**2 + (self._value * other._error)**2 ))
 
-        return Measure(value, error, aproximar = False)
+        return Measure(value, error, aproximate = False)
 
     def __rmul__(self, val):
-        return Measure(val * self._value, abs(val) * self._error, aproximar = False)
+        return Measure(val * self._value, abs(val) * self._error, aproximate = False)
 
     def __truediv__(self, other):
         # Si es un escalar
@@ -216,18 +216,18 @@ class Measure:
             value = self._value/other._value
             error = np.sqrt(np.array( (1/other._value * self._error)**2
                             + (self._value/other._value**2 * other._error)**2 ))
-        return Measure(value, error, aproximar = False)
+        return Measure(value, error, aproximate = False)
 
     def __rtruediv__(self, other):
-        return Measure(other/self._value, abs(other/self._value**2) * self._error, aproximar = False)
+        return Measure(other/self._value, abs(other/self._value**2) * self._error, aproximate = False)
 
     def __pow__(self, other):
         value = self._value**other
         error = abs((other)*self._value**(other-1))*self._error
-        return Measure(value, error, aproximar = False)
+        return Measure(value, error, aproximate = False)
 
     def __and__(self, other):
-        return Measure(self._value + other._value, self._error + other._error, aproximar = False)
+        return Measure(self._value + other._value, self._error + other._error, aproximate = False)
 
     def __or__(self, other):
         return self & -other
@@ -242,7 +242,7 @@ class Measure:
 
     def __getitem__(self, index):
         if not hasattr(index, '__getitem__'):
-            return Measure(self._value[index], self._error[index], aproximar=False)
+            return Measure(self._value[index], self._error[index], aproximate=False)
         
         indice_deseado = index[0]
         valor_o_error = index[1]
@@ -307,8 +307,8 @@ class Line:
     '''Objeto que representa una recta, contiene dos values, una para la ordenada en el origen y otra para la
     slope de la recta. Pueden obtenerse desestructurandola al igual que una tupla (slope, n_0)'''
     def __init__(self, slope=0, n_0=0, x=[]):
-        self.slope = Measure(slope, aproximar = False)
-        self.n_0 = Measure(n_0, aproximar = False)
+        self.slope = Measure(slope, aproximate = False)
+        self.n_0 = Measure(n_0, aproximate = False)
         self.x = Measure(x)
 
     def aprox(self):
