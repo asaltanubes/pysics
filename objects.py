@@ -4,33 +4,35 @@ import numpy as np
 from math import nan
 from . import calculos
 
-# Markers para indexar en values
+# Markers to index in values
 VALUE = object()
 ERROR = object()
 
 def _get_error(value, error):
-    '''
-    Convierte un error pasado a una value en un error que la value puede manejar
-    El tipo debe ser np.ndarray[Number]. Si se pasa un solo valor a la función se
-    toma como un error constante para toda la value
-    '''
+    """
+    Transform the error passed to a value into an error that the value can handle
+    The type must be np.ndarray[Number]. If a single value is passed to the function, it is
+    taken as a constant error for the entire value
+    """
     
     if hasattr(error, '__iter__'):
         if not len(value) == len(error):
             if len(error) != 1:
                 raise ValueError(
-                "No hay el mismo número de values que de errores o no es un error constante")
+                "There is not the same number of values as errors or it is not a constant error")
             error = (error * len(value))
     else:
                 error = [error]*len(value)
     return np.array([abs(i) for i in error])
 class Measure:
-    """Objeto básico para guardar values. Se le puede dar una o varias values
-    (en una lista) y sus respectivos errores"""
+    """
+    Basic object to store values. It can be given one or several values
+    (in a list) and their respective errors
+    """
     def __init__(self, value: list[float], error: list[float] = None, aproximate: bool = True):
         if not isinstance(value, Measure):
             error = 0 if error is None else error
-            # Si no se pasa un iterable se convierte en uno
+            # If it is not an iterable, it is converted into one
             if not hasattr(value, '__iter__'):
                 value = [value]
             
@@ -50,9 +52,9 @@ class Measure:
 
     @classmethod
     def from_pairs(self, *args, aproximate=False):
-        '''
-            Dado un grupo de parejas de valores con sus errores devuelve la value correspondiente
-        '''
+        """
+        Given a group of pairs of values with their errors, it returns the corresponding value
+        """
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
         return self([i[0] for i in args], [i[1] for i in args], aproximate=aproximate)
@@ -66,111 +68,114 @@ class Measure:
         return [float(i) for i in self._error]
 
     def unpack(self) -> tuple[list[float], list[float]]:
-        """Devuelve una tupla con la(s) value(s) y su(s) error(es)"""
+        """
+        Returns a tuple with the value(s) and its (their) error(s)
+        """
         return list(self._value), list(self._error)
 
     def list_of_values(self):
-        """Devuelve una lista con los valores contenidos como values individuales"""
+        """Returns a list with the values contained as individual values"""
         return [Measure(*i, aproximate=False).cambia_estilo(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self):
-        """Retorna una copia INDEslope de si misma. Todos los punteros a los datos son distintos"""
-        # los list son para hacer que las listas sean indeslopes
+        """Returns an independent copy of itself. All the pointers to the data are different"""
+        # the list are to make the lists independent
         return Measure(list(self._value), list(self._error), aproximate=False).cambia_estilo(self.__print_style)
 
-    def aprox(self, decimales = None):
-        """Aproxima los valores de la value"""
-        if decimales is None:
+    def aprox(self, decimals = None):
+        """Aproximate the values of the value"""
+        # The list are to make the lists independent
+        if decimals is None:
             self._value, self._error = aprox(self._value, self._error)
         else:
-            self._value = np.array([calculos.round(i, decimales) for i in self._value])
-            self._error = np.array([calculos.round(i, decimales) for i in self._error])
+            self._value = np.array([calculos.round(i, decimals) for i in self._value])
+            self._error = np.array([calculos.round(i, decimals) for i in self._error])
             
         return self
 
     def mean(self) -> float:
-        """Calcula la media de los valores"""
+        """Calculate the mean of the values"""
         return float(mean(*self._value))
 
     def standard_deviation(self) -> float:
-        """Calcula la desviación estandar de los valores de la value"""
+        """Calculates the standard deviation of the values of the value"""
         return float(standard_deviation(*self._value))
 
     def standard_error(self) -> float:
-        """Calcula el error estandar de los valores de la value (desviación estandar de la media)"""
+        """Calculates the standard error of the values of the value (standard deviation of the mean)"""
         return float(standard_error(*self._value))
 
     def estimation(self):
-        """Calcula la media de los valores de la value y el error de esta sumando en cuadratura el error estandar y el error"""
+        """Calculates the mean of the values of the value and the error of this summing in quadrature the standard error and the error"""
         return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximate = False)
 
     def sqrt(self):
-        m = np.array([m.sqrt() for m in self._value])
-        e = 1/(2*m)*self._error
-        return Measure(m, e, aproximate=False)
+        v = np.array([v.sqrt() for v in self._value])
+        e = 1/(2*v)*self._error
+        return Measure(v, e, aproximate=False)
 
-    def cambia_style(self, estilo):
-        """Cambia el estilo actual por otro"""
-        if estilo in self.Estilo.__dict__.values():
-            self.__print_style = estilo
+    def change_style(self, style):
+        """Changes the current style for another"""
+        if style in self.Style.__dict__.values():
+            self.__print_style = style
             return self
         else:
-            raise TypeError(f'El estilo {estilo} no es un estilo válido')
+            raise TypeError(f'El estilo {style} no es un estilo válido')
 
     class Style:
-        """Clase conteninendo las diferentes funciones que representan la clase value"""
+        """Class containing the different functions that represent the value class"""
         def list(self):
-            """[values] ± [errores]"""
+            """[values] ± [errors]"""
             if len(self._value) == 1:
-                m = self._value[0]
+                v = self._value[0]
                 e = self._error[0]
             else:
-                m = [str(i) for i in self._value]
+                v = [str(i) for i in self._value]
                 e = [str(i) for i in self._error]
-            return f'{m} ± {e}'
+            return f'{v} ± {e}'
 
         def pm(self):
-            """value 1 ± error 1, value2 ± error 2, ..."""
+            """value 1 ± error 1, value 2 ± error 2, ..."""
             l = []
-            for m, e in zip(self._value, self._error):
-                l.append(f'{m} ± {e}')
+            for v, e in zip(self._value, self._error):
+                l.append(f'{v} ± {e}')
             return ', '.join(l)
         
         def a(self):
             return 'datos'
 
         def table(self):
-            """Igual que pm pero solo funciona con una value de longitud 1 por razones de debug"""
+            """Same as pm but only works with a value of length 1 for debug reasons"""
             if len(self._value) == 1:
-                m = self._value[0]
+                v = self._value[0]
                 e = self._error[0]
                 if e == 0:
-                    return str(m)
-                return f'{m} ± {e}'
+                    return str(v)
+                return f'{v} ± {e}'
             else:
-                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError("The value must contain only one value to use the 'table' style")
 
         def latex_table(self):
-            """Igual que tabla pero en math mode"""
+            """Same as table but in math mode for latex"""
             if len(self._value) == 1:
-                m = self._value[0]
+                v = self._value[0]
                 e = self._error[0]
                 if e == 0:
-                    return "$" + str(m)+ "$"
-                return f'${m} ' +  r"\pm" + f' {e}$'
+                    return "$" + str(v)+ "$"
+                return f'${v} ' +  r"\pm" + f' {e}$'
             else:
-                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError("The value must contain only one value to use the 'table' style")
             
         def typst_table(self):
-            """Igual que tabla pero en math mode"""
+            """Same as table but in math mode for typst"""
             if len(self._value) == 1:
-                m = self._value[0]
+                v = self._value[0]
                 e = self._error[0]
                 if e == 0:
-                    return "$" + str(m)+ "$"
-                return f'${m} ' +  r"plus.minus" + f' {e}$'
+                    return "$" + str(v)+ "$"
+                return f'${v} ' +  r"plus.minus" + f' {e}$'
             else:
-                raise ValueError('La value solo debe contener un valor para emplear el estilo "tabla"')
+                raise ValueError("The value must contain only one value to use the 'table' style")
 
 # -----------------------------------------------------------------------------
     def __abs__(self):
@@ -194,7 +199,7 @@ class Measure:
         return -self + other
 
     def __mul__(self, other):
-        # Si es un escalar
+        # If it is a scalar
         if not isinstance(other, Measure):
             value = self._value * other
             error = self._error * abs(other)
@@ -208,7 +213,7 @@ class Measure:
         return Measure(val * self._value, abs(val) * self._error, aproximate = False)
 
     def __truediv__(self, other):
-        # Si es un escalar
+        # If it is a scalar
         if not isinstance(other, Measure):
             value = self._value/other
             error = self._error/abs(other)
@@ -244,35 +249,35 @@ class Measure:
         if not hasattr(index, '__getitem__'):
             return Measure(self._value[index], self._error[index], aproximate=False)
         
-        indice_deseado = index[0]
-        valor_o_error = index[1]
-        if valor_o_error is VALUE:
-            return self._value[indice_deseado]
-        elif valor_o_error is ERROR:
-            return self._error[indice_deseado]
-        raise TypeError("El valor del índice contiene algo que no es ni un valor ni un error")    
+        expected_index = index[0]
+        value_o_error = index[1]
+        if value_o_error is VALUE:
+            return self._value[expected_index]
+        elif value_o_error is ERROR:
+            return self._error[expected_index]
+        raise TypeError("The index value contains something that is not a value or an error")    
     
     def __setitem__(self, index, value):
         if hasattr(index, "__getitem__"):
-            indice = index[0]
-            valor_o_error = index[1]
+            indx = index[0]
+            value_or_error = index[1]
             value = Measure(value)
-            if type(indice) == slice:
-                if valor_o_error is VALUE:
-                    self._value[indice] = value._value
-                elif valor_o_error is ERROR:
-                    self._error[indice] = value._value
-                else: raise Exception("No se ha especificado si se debe actualizar value o error")
+            if type(indx) == slice:
+                if value_or_error is VALUE:
+                    self._value[indx] = value._value
+                elif value_or_error is ERROR:
+                    self._error[indx] = value._value
+                else: raise Exception("It has not been specified if it should update value or error")
                 if len(self._value) != len(self._error):
-                    raise TypeError("El valor nuevo no llena todos los datos anteriores")
+                    raise TypeError("The new value does not fill all the previous data")
             else:
-                if valor_o_error is VALUE:
-                    self._value[indice] = value._value[0]
-                elif valor_o_error is ERROR:
-                    self._error[indice] = value._value[0]
-                else: raise Exception("No se ha especificado si se debe actualizar value o error")
+                if value_or_error is VALUE:
+                    self._value[indx] = value._value[0]
+                elif value_or_error is ERROR:
+                    self._error[indx] = value._value[0]
+                else: raise Exception("It has not been specified if it should update value or error")
                 if len(self._value) != len(self._error):
-                    raise TypeError("El valor nuevo no llena todos los datos anteriores")
+                    raise TypeError("The new value does not fill all the previous data")
         else:
             if type(index) == slice:
                 if isinstance(value, Measure):
@@ -304,8 +309,10 @@ class Measure:
         return (float(i) for i in self.value)
 
 class Line:
-    '''Objeto que representa una recta, contiene dos values, una para la ordenada en el origen y otra para la
-    slope de la recta. Pueden obtenerse desestructurandola al igual que una tupla (slope, n_0)'''
+    """
+    Object that represents a line, it contains two values, one for the slope and another for the
+    ordinate in the origin. It can be deconstructed as a tuple (slope, n_0)
+    """
     def __init__(self, slope=0, n_0=0, x=[]):
         self.slope = Measure(slope, aproximate = False)
         self.n_0 = Measure(n_0, aproximate = False)
@@ -320,14 +327,14 @@ class Line:
         return Line(self.slope.copy(), self.n_0.copy())
 
     def intersection(self, other):
-        """Punto de corte con otra recta"""
+        """Point of intersection with another line"""
         if not isinstance(other, Line):
             other = Line(0, other)
-        delta_p = self.slope - other.slope
+        delta_s = self.slope - other.slope
         delta_n = other.n_0 - self.n_0
-        if delta_p == 0:
+        if delta_s == 0:
             return nan
-        x = delta_n/delta_p
+        x = delta_n/delta_s
         y = self.slope * x + self.n_0
         return (x, y)
 
@@ -343,7 +350,7 @@ class Line:
         return f'y = ({self.slope}) x + ({self.n_0})'
 
     def __repr__(self):
-        return f'Recta( {self} )'
+        return f'Line( {self} )'
 
 if __name__ == '__main__':
     # pass
