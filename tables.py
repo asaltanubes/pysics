@@ -4,7 +4,7 @@ from tabulate import tabulate
 def transpose(l: list) -> list:
     return list(zip(*l))
 
-def create_table_list(l: list, header=None, transpose=False, style = Measure.Estilo.table) -> list[list]:
+def create_table_list(l: list, header=None, transpose=False, style = Measure.Style.table) -> list[list]:
     a = []
     for element in l:
         if isinstance(element, Measure):
