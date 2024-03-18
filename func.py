@@ -57,20 +57,9 @@ def tan(x):
 def asin(x):
     x = Measure(x)
         
-    if not (1 in x.value or -1 in x.value):
-        value = np.arcsin(x.value)
-        error = x.error/np.sqrt(1-np.power(x.value, 2))
-    else: 
-        value = np.zeros(len(x.value))
-        error = np.zeros(len(x.error))
-        for i, (v, e) in enumerate(zip(x.value, x.error)):
-            if v != 1 and v != -1:
-                value[i] = np.arcsin(v)
-                error[i] = e/np.sqrt(1-np.power(v, 2))
-            else:
-                value[i] = np.arcsin(v)
-                error[i] = np.abs(np.arcsin(v-e)-v)
-            
+    value = np.arcsin(x.value)
+    error = x.error/np.sqrt(1-np.power(value, 2))
+
     return Measure(value, error, aproximate=False)
 
 
@@ -78,27 +67,16 @@ def acos(x):
     
     x = Measure(x)
         
-    if not (1 in x.value or -1 in x.value):
-        value = np.arccos(x.value)
-        error = x.error/np.sqrt(1-np.power(x.value, 2))
-    else:
-        value = np.zeros(len(x.value))
-        error = np.zeros(len(x.error))
-        for i, (v, e) in enumerate(zip(x.value, x.error)):
-            if v != 1 and v != -1:
-                value[i] = np.arccos(v)
-                error[i] = e/np.sqrt(1-np.power(v, 2))
-            else:
-                value[i] = np.arccos(v)
-                d = v-e if v>0 else v+e
-                error[i] = np.abs(np.arccos(d)-np.arccos(v))
+    value = np.arccos(x.value)
+    error = x.error/np.sqrt(1-np.power(value, 2))
+
     return Measure(value, error, aproximate=False)
 
 
 def atan(x):
     x = Measure(x)
     value = np.arctan(x.value)
-    error = x.error/(1+np.power(x.value, 2))
+    error = x.error/(1+np.power(value, 2))
     return Measure(value, error, aproximate=False)
 
 def atan2(x: Measure, y: Measure):
