@@ -60,19 +60,8 @@ def asin(x):
     if not isinstance(x, Medida):
         x = Medida(x)
         
-    if not (1 in x._medida or -1 in x._medida):
-        valor = np.arcsin(x._medida)
-        error = x._error/np.sqrt(1-np.power(x._medida, 2))
-    else: 
-        valor = np.zeros(len(x._medida))
-        error = np.zeros(len(x._error))
-        for i, (v, e) in enumerate(zip(x._medida, x._error)):
-            if v != 1 and v != -1:
-                valor[i] = np.arcsin(v)
-                error[i] = e/np.sqrt(1-np.power(v, 2))
-            else:
-                valor[i] = np.arcsin(v)
-                error[i] = np.abs(np.arcsin(v-e)-v)
+    valor = np.arcsin(x._medida)
+    error = x._error/np.sqrt(1-np.power(valor, 2))
             
     return Medida(valor, error, aproximar=False)
 
@@ -84,18 +73,8 @@ def acos(x):
         
     if not (1 in x._medida or -1 in x._medida):
         valor = np.arccos(x._medida)
-        error = x._error/np.sqrt(1-np.power(x._medida, 2))
-    else:
-        valor = np.zeros(len(x._medida))
-        error = np.zeros(len(x._error))
-        for i, (v, e) in enumerate(zip(x._medida, x._error)):
-            if v != 1 and v != -1:
-                valor[i] = np.arccos(v)
-                error[i] = e/np.sqrt(1-np.power(v, 2))
-            else:
-                valor[i] = np.arccos(v)
-                d = v-e if v>0 else v+e
-                error[i] = np.abs(np.arccos(d)-np.arccos(v))
+        error = x._error/np.sqrt(1-np.power(valor, 2))
+
     return Medida(valor, error, aproximar=False)
 
 
@@ -104,7 +83,8 @@ def atan(x):
     if not isinstance(x, Medida):
         x = Medida(x)
     valor = np.arctan(x._medida)
-    error = x._error/(1+np.power(x._medida, 2))
+    error = x._error/(1+np.power(valor, 2))
+
     return Medida(valor, error, aproximar=False)
 
 def atan2(x: Medida, y: Medida):
