@@ -31,6 +31,8 @@ def sen(x: Medida) -> Medida:
         
     return Medida(valor, error, aproximar = False)
 
+sin = sen
+
 def cos(x: Medida) -> Medida:
     """Calcula el coseno de una medida"""
     if not isinstance(x, Medida):
@@ -79,7 +81,7 @@ def acos(x):
 
 
 def atan(x):
-    
+
     if not isinstance(x, Medida):
         x = Medida(x)
     valor = np.arctan(x._medida)
