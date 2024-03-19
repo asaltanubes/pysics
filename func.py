@@ -58,7 +58,7 @@ def asin(x):
     x = Measure(x)
         
     value = np.arcsin(x.value)
-    error = x.error/np.sqrt(1-np.power(value, 2))
+    error = x.error/np.sqrt(1-np.power(x.value, 2))
 
     return Measure(value, error, aproximate=False)
 
@@ -68,7 +68,7 @@ def acos(x):
     x = Measure(x)
         
     value = np.arccos(x.value)
-    error = x.error/np.sqrt(1-np.power(value, 2))
+    error = x.error/np.sqrt(1-np.power(x.value, 2))
 
     return Measure(value, error, aproximate=False)
 
@@ -76,7 +76,7 @@ def acos(x):
 def atan(x):
     x = Measure(x)
     value = np.arctan(x.value)
-    error = x.error/(1+np.power(value, 2))
+    error = x.error/(1+np.power(x.value, 2))
     return Measure(value, error, aproximate=False)
 
 def atan2(x: Measure, y: Measure):
