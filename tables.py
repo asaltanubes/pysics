@@ -1,7 +1,7 @@
 from .objects import Measure
 from tabulate import tabulate
 
-def transpose(l: list) -> list:
+def transposer(l: list) -> list:
     return list(zip(*l))
 
 def create_table_list(l: list, header=None, transpose=False, style = Measure.Style.table) -> list[list]:
@@ -19,7 +19,7 @@ def create_table_list(l: list, header=None, transpose=False, style = Measure.Sty
             header = header + ['']*(len(l)-len(header))
         l = [[h] + l for h, l in zip(header, l)]
     if not transpose:
-        l = transpose(l)
+        l = transposer(l)
     return [[str(l) for l in j] for j in l]
 
 def terminal(data: list, header: list = None, transpose: bool = False) -> str:
