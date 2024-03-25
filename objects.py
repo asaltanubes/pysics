@@ -335,7 +335,7 @@ class Line:
             other = Line(0, other)
         delta_s = self.slope - other.slope
         delta_n = other.n_0 - self.n_0
-        if delta_s == 0:
+        if delta_s.value == 0:
             return nan
         x = delta_n/delta_s
         y = self.slope * x + self.n_0
