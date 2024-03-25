@@ -48,7 +48,7 @@ def line(x: Union[list[float], Line], slope: Union[Measure, float, Line]=0, n_0=
     if isinstance(x, Line):
         slope = x.slope
         n_0 = x.n_0
-        x = x.value
+        x = x.x
     plt.plot(x, fit_line(x, slope, n_0), c=c, label=label, **kargs)
 
 def curve(function, x, coefs, log_linspace = False, label = None, n=100, **kargs):

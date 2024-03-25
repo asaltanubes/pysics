@@ -74,7 +74,7 @@ def least_squares(x: list[float], y: list[float], aproximate: bool = False) -> L
     slope: Measure = Measure(slope, dslope, aproximate=aproximate)
     n_0: Measure = Measure(n_0, dn_0, aproximate=aproximate)
     if isinstance(x, Measure):
-        x = x.Measure
+        x = x.value
     return Line(slope, n_0, x)
 
 def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, aproximate: bool = False) -> Line:
@@ -114,7 +114,7 @@ def line(x: list[float] , slope: float, n_0: float=0) -> list[float]:
 
     if isinstance(slope, Line):
         n_0 = slope.n_0
-        slope = slope.slopediente
+        slope = slope.slope
 
 
     x = np.array(x)

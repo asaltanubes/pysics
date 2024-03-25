@@ -1,5 +1,5 @@
 from .objects import Measure
-from .tables import transpose
+from .tables import transposer
 
 
 def load(file: str, separator: str = '\t', line: str = '\n', decimal: str = ',', headers: int = 0, by_columns=True) -> list[list[float]]:
@@ -30,7 +30,7 @@ def save_latex(file: str, data: list, separator: str = '\t', line: str = '\n', b
     max_len = max((len(i) for i in list_string))        
     list_string = [line if len(line)==max_len else line + ['']*(max_len-len(line))  for line in list_string]
     if not by_columns:
-        list_string = transpose(list_string)
+        list_string = transposer(list_string)
     
     string = line.join([separator.join(element) for element in list_string])
     with open(file, 'w+') as file:

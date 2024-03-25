@@ -1,5 +1,5 @@
 from .aprox import aprox
-from .estadistica import mean, standard_deviation, standard_error
+from .statistic import mean, standard_deviation, standard_error
 import numpy as np
 from math import nan
 from . import calculos
@@ -48,7 +48,7 @@ class Measure:
                 
         if aproximate:
             self.aprox()
-        self.__print_style = self.Estilo.pm
+        self.__print_style = self.Style.pm
 
     @classmethod
     def from_pairs(self, *args, aproximate=False):
@@ -75,12 +75,12 @@ class Measure:
 
     def list_of_values(self):
         """Returns a list with the values contained as individual values"""
-        return [Measure(*i, aproximate=False).cambia_estilo(self.__print_style) for i in zip(self._value, self._error)]
+        return [Measure(*i, aproximate=False).change_style(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self):
         """Returns an independent copy of itself. All the pointers to the data are different"""
         # the list are to make the lists independent
-        return Measure(list(self._value), list(self._error), aproximate=False).cambia_estilo(self.__print_style)
+        return Measure(list(self._value), list(self._error), aproximate=False).change_style(self.__print_style)
 
     def aprox(self, decimals = None):
         """Aproximate the values of the value"""
@@ -110,7 +110,7 @@ class Measure:
         return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximate = False)
 
     def sqrt(self):
-        v = np.array([v.sqrt() for v in self._value])
+        v = np.array([np.sqrt(v) for v in self._value])
         e = 1/(2*v)*self._error
         return Measure(v, e, aproximate=False)
 
@@ -303,7 +303,7 @@ class Measure:
         return self.__print_style(self)
 
     def __repr__(self):
-        return "Measure( " + repr(self) + " )"
+        return "Measure( " + str(self) + " )"
     
     def __iter__(self):
         return (float(i) for i in self.value)
@@ -316,7 +316,10 @@ class Line:
     def __init__(self, slope=0, n_0=0, x=[]):
         self.slope = Measure(slope, aproximate = False)
         self.n_0 = Measure(n_0, aproximate = False)
-        self.x = Measure(x)
+        if not isinstance(x, Measure):
+            self.x = Measure(x)
+        else:
+            self.x = x
 
     def aprox(self):
         self.slope.aprox()

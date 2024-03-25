@@ -5,7 +5,7 @@ from .constants import pi
 from . import fit
 from . import aprox
 from . import reader
-from . import estadistica
+from . import statistic
 from . import func
 from . import objects
 from . import plot
