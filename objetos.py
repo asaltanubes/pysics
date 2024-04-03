@@ -105,8 +105,9 @@ class Medida:
         return float(error_estandar(*self._medida))
 
     def estimacion(self):
-        """Calcula la media de los valores de la medida y el error de esta sumando en cuadratura el error estandar y el error"""
-        return Medida([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximar = False)
+        """Calcula la media de los valores de la medida y estima el error comparando el error cuadratico medio y el error estandar y devuelve el mayor"""
+        error_cuadratico_medio = np.sqrt(np.sum(self._error**2))/len(self._error)
+        return Medida(self.media(), np.max([self.error_estandar(), error_cuadratico_medio]), aproximar = False)
     
     def rad(self):
         '''Convierte a radianes desde grados'''
