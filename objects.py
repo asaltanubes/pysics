@@ -106,8 +106,10 @@ class Measure:
         return float(standard_error(*self._value))
 
     def estimation(self):
-        """Calculates the mean of the values of the value and the error of this summing in quadrature the standard error and the error"""
-        return Measure([self.media()]*len(self._error), list(np.sqrt( self.error_estandar()**2 + self._error**2 )), aproximate = False)
+        """Calculates the mean of the values of the value and estimates the error by comparing 
+        the standard error and the mean squared error and takes the larger of the two"""
+        mean_squared_error = np.sqrt(np.sum(self._error**2))
+        return Measure(self.mean(), list(np.max([self.standard_error(), mean_squared_error])), aproximate = False)
 
     def sqrt(self):
         v = np.array([np.sqrt(v) for v in self._value])
