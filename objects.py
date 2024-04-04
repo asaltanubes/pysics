@@ -73,7 +73,7 @@ class Measure:
         """
         return list(self._value), list(self._error)
 
-    def list_of_values(self):
+    def list_of_measures(self):
         """Returns a list with the values contained as individual values"""
         return [Measure(*i, aproximate=False).change_style(self.__print_style) for i in zip(self._value, self._error)]
 

@@ -131,7 +131,7 @@ def delta(x: Measure) -> Measure:
 
     values = []
     errors = []
-    for i, j in zip(x[1:].list_of_values(), x[:-1].list_of_values()):
+    for i, j in zip(x[1:].list_of_measures(), x[:-1].list_of_measures()):
         v = i-j
         values.append(v.value[0])
         errors.append(v.error[0])

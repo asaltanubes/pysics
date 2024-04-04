@@ -20,7 +20,7 @@ def save_latex(file: str, data: list, separator: str = '\t', line: str = '\n', b
     data = [row if hasattr(row, '__iter__') else [row] for row in data]
     
     def parser(data):
-        iter = data if not isinstance(data, Measure) else data.copy().change_style(style).list_of_values()
+        iter = data if not isinstance(data, Measure) else data.copy().change_style(style).list_of_measures()
         return list(map(str, iter))
         
     

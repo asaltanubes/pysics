@@ -25,7 +25,7 @@ def scatter(x: list[float], y: list[float], c: str = 'tab:red', fill = True, mar
     y = np.array(y)
 
     if xerr is not None or yerr is not None:
-        plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, zorder = barzorder)
+        errorbar(x, y, yerr = yerr, xerr = xerr, errorbarcolor = errorbarcolor, zorder = barzorder)
 
     facecolors = 'none' if not fill else c
     plt.scatter(x, y, s=s, marker = marker, facecolors = facecolors, edgecolors = c, label=label, zorder = zorder, **kargs)
@@ -108,7 +108,7 @@ def errorbar(x: list[float], y: list[float], yerr=None, xerr = None, errorbarcol
         if yerr == None:
             yerr = y.error
         y = y.value
-    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', zorder = 0, **kargs)
+    plt.errorbar(x, y, yerr = yerr, xerr = xerr, ecolor = errorbarcolor, fmt = 'none', **kargs)
 
 
 def text(text: str = '', x: float = 0, y: float = 0, fontsize = 10, **kargs):

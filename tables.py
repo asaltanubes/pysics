@@ -8,7 +8,7 @@ def create_table_list(l: list, header=None, transpose=False, style = Measure.Sty
     a = []
     for element in l:
         if isinstance(element, Measure):
-            a.append([i.change_style(style) for i in element.list_of_values()])
+            a.append([i.change_style(style) for i in element.list_of_measures()])
         else:
             a.append(element)
     l = a
