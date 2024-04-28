@@ -1,4 +1,4 @@
-from .objects import Measure, Line, VALUE, ERROR
+from .objects import Measure, Line, VALUE, ERROR, Unit
 from .reader import load
 from .constants import pi
 

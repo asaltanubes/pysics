@@ -8,6 +8,54 @@ from . import calculos
 VALUE = object()
 ERROR = object()
 
+
+class UnitError(Exception):
+    pass
+
+class Unit:
+    # kg m s A K mol cd
+    def __init__(self, si = [0, 0, 0, 0, 0, 0, 0], scale = 1, value=1, symbol=""):
+        if type(si) == Unit:
+            symbol = symbol if symbol != "" else si.symbol
+            si = si.si
+        self.si = np.array(si) 
+        self.value = value
+        self.scale = scale
+        self.symbol = symbol
+    
+    def convert(self, *basis) -> tuple[list[float], float]:
+        sol = np.linalg.lstsq(np.transpose([i.si for i in basis]), self.si, -1)[0]
+        return (sol, np.prod(np.array([i.scale for i in basis]) ** (-sol)))
+
+    def __mul__(self, other):
+        if not isinstance(other, Unit):
+            other = Unit(value=other)
+        si = self.si + other.si
+        value = self.value * other.value
+        scale = self.scale*other.scale
+
+        return Unit(si, scale, value)
+    
+    def __truediv__(self, other):
+        return self*other**-1
+
+    def __pow__(self, power):
+        si = self.si*power
+        scale = self.scale**power
+        value = self.value**power
+        return Unit(si, scale, value)
+    
+    def __rmul__(self, other):
+        return self*other
+    
+    def __rtruediv__(self, other):
+        return self**-1*other
+    
+    def __str__(self):
+        if self.scale != 1:
+           return str(self.scale) + "  " + self.symbol 
+        return self.symbol  
+
 def _get_error(value, error):
     """
     Transform the error passed to a value into an error that the value can handle
@@ -17,26 +65,32 @@ def _get_error(value, error):
     
     if hasattr(error, '__iter__'):
         if not len(value) == len(error):
-            if len(error) != 1:
+            if len(error) != 0:
                 raise ValueError(
                 "There is not the same number of values as errors or it is not a constant error")
             error = (error * len(value))
     else:
                 error = [error]*len(value)
     return np.array([abs(i) for i in error])
+
 class Measure:
     """
     Basic object to store values. It can be given one or several values
     (in a list) and their respective errors
     """
-    def __init__(self, value: list[float], error: list[float] = None, aproximate: bool = True):
+    def __init__(self, value: list[float], error: list[float] = None, aproximate: bool = True, units = None):
+        if isinstance(value, Unit):
+            units = Unit(value.si, scale=value.scale, value=1)
+            value = np.array([value.value])
+
+
         if not isinstance(value, Measure):
             error = 0 if error is None else error
             # If it is not an iterable, it is converted into one
             if not hasattr(value, '__iter__'):
                 value = [value]
             
-            self._value = np.array([i for i in value])
+            self._value = np.array(value)
             self._error  = _get_error(value, error)
         else:
             value = value.copy()
@@ -45,7 +99,16 @@ class Measure:
                 self._error = value._error
             else:
                 self._error = _get_error(value._value, error)
-                
+            units = value.units
+            
+        if units is None:
+            units = Unit()
+            
+        elif type(units) != Unit:
+            units = Unit(units)
+        
+        self.units = units
+        
         if aproximate:
             self.aprox()
         self.__print_style = self.Style.pm
@@ -75,12 +138,12 @@ class Measure:
 
     def list_of_measures(self):
         """Returns a list with the values contained as individual values"""
-        return [Measure(*i, aproximate=False).change_style(self.__print_style) for i in zip(self._value, self._error)]
+        return [Measure(*i, aproximate=False, units=self.units).change_style(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self):
         """Returns an independent copy of itself. All the pointers to the data are different"""
         # the list are to make the lists independent
-        return Measure(list(self._value), list(self._error), aproximate=False).change_style(self.__print_style)
+        return Measure(list(self._value), list(self._error), aproximate=False, units=self.units).change_style(self.__print_style)
 
     def aprox(self, decimals = None):
         """Aproximate the values of the value"""
@@ -181,60 +244,59 @@ class Measure:
 
 # -----------------------------------------------------------------------------
     def __abs__(self):
-        return Measure(abs(self._value), self._error)
+        return Measure(abs(self._value), self._error, aproximate=False, units=self.units)
     
     
     def __add__(self, other):
         if not isinstance(other, Measure):
-            other = Measure(other)
-        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False)
+            other = Measure(other, units=self.units.si)
+
+        if self.units.si != other.units.si:
+            raise UnitError(f"Units are different. left: {self.units.si}, right: {other.units.si}")
+             
+        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False, units=self.units)
 
     def __radd__(self, other):
         return self + other
 
     def __sub__(self, other):
         if not isinstance(other, Measure):
-            other = Measure(other)
-        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False)
+            other = Measure(other, units=self.units)
+ 
+        if self.units.si != other.units.si:
+            raise UnitError(f"Units are different. left: {self.units.si}, right: {other.units.si}")
+            
+        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False, units = self.units)
 
     def __rsub__(self, other):
         return -self + other
 
     def __mul__(self, other):
         # If it is a scalar
-        if not isinstance(other, Measure):
-            value = self._value * other
-            error = self._error * abs(other)
-        else:
-            value = self._value*other._value
-            error = np.sqrt(np.array( (other._value * self._error)**2 + (self._value * other._error)**2 ))
+        other = Measure(other)
+        value = self._value*other._value
+        error = np.sqrt(np.array( (other._value * self._error)**2 + (self._value * other._error)**2 ))
+        units = self.units*other.units
 
-        return Measure(value, error, aproximate = False)
+        return Measure(value, error, aproximate = False, units=units)
 
     def __rmul__(self, val):
         return Measure(val * self._value, abs(val) * self._error, aproximate = False)
 
     def __truediv__(self, other):
-        # If it is a scalar
-        if not isinstance(other, Measure):
-            value = self._value/other
-            error = self._error/abs(other)
-        else:
-            value = self._value/other._value
-            error = np.sqrt(np.array( (1/other._value * self._error)**2
-                            + (self._value/other._value**2 * other._error)**2 ))
-        return Measure(value, error, aproximate = False)
+        return self*other**-1
 
     def __rtruediv__(self, other):
-        return Measure(other/self._value, abs(other/self._value**2) * self._error, aproximate = False)
+        return other*self**-1
 
     def __pow__(self, other):
         value = self._value**other
         error = abs((other)*self._value**(other-1))*self._error
-        return Measure(value, error, aproximate = False)
+        units = self.units**other
+        return Measure(value, error, aproximate = False, units=units)
 
     def __and__(self, other):
-        return Measure(self._value + other._value, self._error + other._error, aproximate = False)
+        return Measure(self._value + other._value, self._error + other._error, aproximate = False, units=self.units)
 
     def __or__(self, other):
         return self & -other
