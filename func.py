@@ -1,5 +1,6 @@
 import numpy as np
 from .objects import Measure
+from . import units
 
 def rad(degrees: Measure) -> Measure:
     """
@@ -17,67 +18,90 @@ def sin(x: Measure) -> Measure:
     """
     Calculate the sine of a value
     """
-    if not isinstance(x, Measure):
-        return np.sin(x)
-    
-    value = np.sin(x.value)
-    error = np.abs(np.cos(x.value))*x.error
-    
+    x = Measure(x)
+
+    if not (np.isclose(x.units.si,  units.rad.si)).all():
+        print("WARNING: the value passed is not an angle")
+    else:
+        x = x.si()
+
+    value = np.sin(x._value)
+    error = np.abs(np.cos(x._value))*x._error
+
     nullvalues = [i for i, v in enumerate(value) if v==1 or v==-1]
     for i in nullvalues:
-        error[i] = np.abs(np.sin(x.value[i]+x.error[i])-np.sin(x.value[i]))
-        
+        error[i] = np.abs(np.sin(x._value[i]+x._error[i])-np.sin(x._value[i]))
+
     return Measure(value, error, aproximate = False)
 
 def cos(x: Measure) -> Measure:
     """
     Calculate the cosine of a value
     """
-    if not isinstance(x, Measure):
-        return np.cos(x)
-    
-    value = np.cos(x.value)
-    error = np.abs(np.sin(x.value))*x.error
-    
+    x = Measure(x)
+
+
+    if not (np.isclose(x.units.si,  units.rad.si)).all():
+        print("WARNING: the value passed is not an angle")
+    else:
+        x = x.si()
+
+    value = np.cos(x._value)
+    error = np.abs(np.sin(x._value))*x._error
+
     nullvalues = [i for i, v in enumerate(value) if v==1 or v==-1]
-    
+
     for i in nullvalues:
-        error[i] = np.abs(np.cos(x.value[i]+x.error[i])-np.cos(x.value[i]))
-    
+        error[i] = np.abs(np.cos(x._value[i]+x._error[i])-np.cos(x._value[i]))
+
     return Measure(value, error, aproximate = False)
 
 def tan(x):
-    if not isinstance(x, Measure):
-        x = Measure(x)
-    value = np.tan(x.value)
-    error = (1+value**2) * x.error
+    x = Measure(x)
+
+    if not (np.isclose(x.units.si,  units.rad.si)).all():
+        print("WARNING: the value passed is not an angle")
+    else:
+        x = x.si()
+
+    value = np.tan(x._value)
+    error = (1+value**2) * x._error
     return Measure(value, error, aproximate=False)
 
 
 def asin(x):
     x = Measure(x)
-        
-    value = np.arcsin(x.value)
-    error = x.error/np.sqrt(1-np.power(x.value, 2))
 
-    return Measure(value, error, aproximate=False)
+    x = x.si()
+    if not (np.isclose(x.units.si,  0)).all(): print("WARNING: the value passed is not adimensional")
+
+    value = np.arcsin(x._value)
+    error = x._error/np.sqrt(1-np.power(x._value, 2)) if (x._value != 1).any() else np.abs(np.arcsin(x._value-x._error) - value)
+
+    return Measure(value, error, aproximate=False, units=units.rad)
 
 
 def acos(x):
-    
     x = Measure(x)
-        
-    value = np.arccos(x.value)
-    error = x.error/np.sqrt(1-np.power(x.value, 2))
 
-    return Measure(value, error, aproximate=False)
+    x = x.si()
+    if not (np.isclose(x.units.si,  0)).all(): print("WARNING: the value passed is not adimensional")
+
+    value = np.arccos(x._value)
+    error = x._error/np.sqrt(1-np.power(x._value, 2)) if (x._value != 1).any() else np.abs(np.arcsin(x._value-x._error) - value)
+
+    return Measure(value, error, aproximate=False, units=units.rad)
 
 
 def atan(x):
     x = Measure(x)
-    value = np.arctan(x.value)
-    error = x.error/(1+np.power(x.value, 2))
-    return Measure(value, error, aproximate=False)
+
+    x = x.si()
+    if not (np.isclose(x.units.si,  0)).all(): print("WARNING: the value passed is not adimensional")
+
+    value = np.arctan(x._value)
+    error = x.error/(1+np.power(x._value, 2))
+    return Measure(value, error, aproximate=False, units=units.rad)
 
 def atan2(x: Measure, y: Measure):
     """
@@ -85,58 +109,69 @@ def atan2(x: Measure, y: Measure):
     """
     x = Measure(x)
     y = Measure(y)
-    
-    angles = [np.arctan2(x, y) for x, y in zip(x.value, y.value)]
-    
-    error = np.sqrt((y.value*x.error)**2+(x.value*y.error)**2)/np.abs(x**2+y**2)
-    
-    return Measure(angles, error, aproximate=False)
+
+
+    if not (np.isclose(x.units.si,  y.units.si)).all():
+        print("WARNING: x and y don't have the same units")
+    else:
+        x = x.si()
+        y = y.si()
+
+    angles = [np.arctan2(x, y) for x, y in zip(x._value, y._value)]
+
+    error = np.sqrt((y._value*x._error)**2+(x._value*y._error)**2)/np.abs(x**2+y**2)
+
+    return Measure(angles, error, aproximate=False, units=units.rad)
 
 def ln(x: Measure) -> Measure:
     """
     Calculate the natural logarithm of a value
     """
-    if not isinstance(x, Measure):
-        return np.log(x)
-    
-    value = np.log(x.value)
-    error = abs(1/x.value)*x.error
+    x = Measure(x)
+
+    if not (np.isclose(x.units.si, 0)).all():
+        print("WARNING: the value passed is not adimensional")
+    else:
+        x = x.si()
+
+    value = np.log(x._value)
+    error = abs(1/x._value)*x._error
     return Measure(value, error, aproximate = False)
 
 def sqrt(x: Measure) -> Measure:
     """
     Calculate the square root of a value
     """
-    if not isinstance(x, Measure):
-        return x**(1/2)
-    return x.sqrt()
-    
+    return x**(1/2)
+
 def exp(x: Measure) -> Measure:
     """
     Calculate the exponential of a value
     """
-    if not isinstance(x, Measure):
-        return np.exp(x)
-    
-    value = np.exp(x.value)
-    error = abs(value)*x.error
+    x = Measure(x)
+
+    if not (np.isclose(x.units.si, 0)).all():
+        print("WARNING: the value passed is not adimensional")
+    else:
+        x = x.si()
+
+    value = np.exp(x._value)
+    error = abs(value)*x._error
     return Measure(value, error, aproximate=False)
 
 def delta(x: Measure) -> Measure:
     """
     Calculate the difference between consecutive values in a measure
     """
-    if not isinstance(x, Measure):
-        x = Measure(x)
+    x = Measure(x)
 
     values = []
     errors = []
     for i, j in zip(x[1:].list_of_measures(), x[:-1].list_of_measures()):
         v = i-j
-        values.append(v.value[0])
-        errors.append(v.error[0])
-    return Measure(values, errors, aproximate=False)
+        values.append(v._value[0])
+        errors.append(v._error[0])
+    return Measure(values, errors, units = x.units, aproximate=False)
 
 if __name__ == '__main__':
     print(cos(acos(Measure(1, 0.1))))
-    
