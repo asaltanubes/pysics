@@ -255,9 +255,9 @@ class Measure:
 
     def estimation(self) -> Self:
         """Calculates the mean of the values of the value and estimates the error by comparing
-        the standard error and the mean squared error and takes the larger of the two"""
-        mean_squared_error = np.sqrt(np.sum(self._error**2))
-        return Measure(self.mean(), list(np.max([self.standard_error(), mean_squared_error])), aproximate = False)
+        the standard error and the mean error and takes the larger of the two"""
+        mean_error = np.sqrt(np.sum(self._error**2))/len(self._error)
+        return Measure(self.mean(), list(np.max([self.standard_error(), mean_error])), aproximate = False)
 
     def change_style(self, style) -> Self:
         """Changes the current style for another"""
