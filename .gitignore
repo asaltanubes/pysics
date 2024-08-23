@@ -1,2 +1,4 @@
 __pycache__
 .vscode
+dist
+pysics_lab.egg-info
