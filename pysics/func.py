@@ -32,7 +32,7 @@ def sin(x: Measure) -> Measure:
     for i in nullvalues:
         error[i] = np.abs(np.sin(x._value[i]+x._error[i])-np.sin(x._value[i]))
 
-    return Measure(value, error, aproximate = False)
+    return Measure(value, error, approximate = False)
 
 def cos(x: Measure) -> Measure:
     """
@@ -54,7 +54,7 @@ def cos(x: Measure) -> Measure:
     for i in nullvalues:
         error[i] = np.abs(np.cos(x._value[i]+x._error[i])-np.cos(x._value[i]))
 
-    return Measure(value, error, aproximate = False)
+    return Measure(value, error, approximate = False)
 
 def tan(x):
     x = Measure(x)
@@ -66,7 +66,7 @@ def tan(x):
 
     value = np.tan(x._value)
     error = (1+value**2) * x._error
-    return Measure(value, error, aproximate=False)
+    return Measure(value, error, approximate=False)
 
 
 def asin(x):
@@ -78,7 +78,7 @@ def asin(x):
     value = np.arcsin(x._value)
     error = x._error/np.sqrt(1-np.power(x._value, 2)) if (x._value != 1).any() else np.abs(np.arcsin(x._value-x._error) - value)
 
-    return Measure(value, error, aproximate=False, units=units.rad)
+    return Measure(value, error, approximate=False, units=units.rad)
 
 
 def acos(x):
@@ -90,7 +90,7 @@ def acos(x):
     value = np.arccos(x._value)
     error = x._error/np.sqrt(1-np.power(x._value, 2)) if (x._value != 1).any() else np.abs(np.arcsin(x._value-x._error) - value)
 
-    return Measure(value, error, aproximate=False, units=units.rad)
+    return Measure(value, error, approximate=False, units=units.rad)
 
 
 def atan(x):
@@ -101,7 +101,7 @@ def atan(x):
 
     value = np.arctan(x._value)
     error = x.error/(1+np.power(x._value, 2))
-    return Measure(value, error, aproximate=False, units=units.rad)
+    return Measure(value, error, approximate=False, units=units.rad)
 
 def atan2(x: Measure, y: Measure):
     """
@@ -121,7 +121,7 @@ def atan2(x: Measure, y: Measure):
 
     error = np.sqrt((y._value*x._error)**2+(x._value*y._error)**2)/np.abs(x**2+y**2)
 
-    return Measure(angles, error, aproximate=False, units=units.rad)
+    return Measure(angles, error, approximate=False, units=units.rad)
 
 def ln(x: Measure) -> Measure:
     """
@@ -136,7 +136,7 @@ def ln(x: Measure) -> Measure:
 
     value = np.log(x._value)
     error = abs(1/x._value)*x._error
-    return Measure(value, error, aproximate = False)
+    return Measure(value, error, approximate = False)
 
 def sqrt(x: Measure) -> Measure:
     """
@@ -157,7 +157,7 @@ def exp(x: Measure) -> Measure:
 
     value = np.exp(x._value)
     error = abs(value)*x._error
-    return Measure(value, error, aproximate=False)
+    return Measure(value, error, approximate=False)
 
 def delta(x: Measure) -> Measure:
     """
@@ -171,7 +171,7 @@ def delta(x: Measure) -> Measure:
         v = i-j
         values.append(v._value[0])
         errors.append(v._error[0])
-    return Measure(values, errors, units = x.units, aproximate=False)
+    return Measure(values, errors, units = x.units, approximate=False)
 
 if __name__ == '__main__':
     print(cos(acos(Measure(1, 0.1))))

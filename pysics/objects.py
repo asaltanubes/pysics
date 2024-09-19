@@ -1,8 +1,8 @@
-from .aprox import aprox
+from .approx import approx
 from .statistic import mean, standard_deviation, standard_error
 import numpy as np
 from math import nan
-from . import calculos
+from . import round
 from typing import Self
 
 type number = int | float
@@ -122,8 +122,8 @@ class Unit:
         return self**-1*other
 
     def __str__(self):
-        if self.scale != 1:
-           return str(self.scale) + "  " + self.symbol
+        if self.value != 1:
+            return str(self.value) + " " + self.symbol
         return self.symbol
 
     def __repr__(self):
@@ -151,7 +151,7 @@ class Measure:
     Basic object to store values. It can be given one or several values
     (in a list) and their respective errors
     """
-    def __init__(self, value: listable , error: listable | None = None, aproximate: bool = True, units = None):
+    def __init__(self, value: listable , error: listable | None = None, approximate: bool = True, units = None):
         if isinstance(value, Unit):
             units = Unit(value.si, scale=value.scale, value=1, symbol=value.symbol)
             value = np.array([value.value])
@@ -181,18 +181,18 @@ class Measure:
 
         self.units = units
 
-        if aproximate:
-            self.aprox()
+        if approximate:
+            self.approx()
         self.__print_style = self.Style.pm
 
     @classmethod
-    def from_pairs(cls, *args, aproximate=False) -> Self:
+    def from_pairs(cls, *args, approximate=False) -> Self:
         """
         Given a group of pairs of values with their errors, it returns the corresponding value
         """
         if not all([len(i) == 2 for i in args]):
             raise TypeError(f"Expected pairs of numbers but at least one of them isnt")
-        return cls([i[0] for i in args], [i[1] for i in args], aproximate=aproximate)
+        return cls([i[0] for i in args], [i[1] for i in args], approximate=approximate)
 
     @property
     def value(self) -> list[float]:
@@ -210,21 +210,21 @@ class Measure:
 
     def list_of_measures(self) -> list["Measure"]:
         """Returns a list with the values contained as individual values"""
-        return [Measure(*i, aproximate=False, units=self.units).change_style(self.__print_style) for i in zip(self._value, self._error)]
+        return [Measure(*i, approximate=False, units=self.units).change_style(self.__print_style) for i in zip(self._value, self._error)]
 
     def copy(self) -> "Measure":
         """Returns an independent copy of itself. All the pointers to the data are different"""
         # the list are to make the lists independent
-        return Measure(list(self._value), list(self._error), aproximate=False, units=self.units).change_style(self.__print_style)
+        return Measure(list(self._value), list(self._error), approximate=False, units=self.units).change_style(self.__print_style)
 
-    def aprox(self, decimals = None) -> Self:
-        """Aproximate the values of the value"""
+    def approx(self, decimals = None) -> Self:
+        """approximate the values of the value"""
         # The list are to make the lists independent
         if decimals is None:
-            self._value, self._error = aprox(self._value, self._error)
+            self._value, self._error = approx(self._value, self._error)
         else:
-            self._value = np.array([calculos.round(i, decimals) for i in self._value])
-            self._error = np.array([calculos.round(i, decimals) for i in self._error])
+            self._value = np.array([round.round(i, decimals) for i in self._value])
+            self._error = np.array([round.round(i, decimals) for i in self._error])
 
         return self
 
@@ -257,7 +257,7 @@ class Measure:
         """Calculates the mean of the values of the value and estimates the error by comparing
         the standard error and the mean error and takes the larger of the two"""
         mean_error = np.sqrt(np.sum(self._error**2))/len(self._error)
-        return Measure(self.mean(), list(np.max([self.standard_error(), mean_error])), aproximate = False)
+        return Measure(self.mean(), list(np.max([self.standard_error(), mean_error])), approximate = False)
 
     def change_style(self, style) -> Self:
         """Changes the current style for another"""
@@ -324,7 +324,7 @@ class Measure:
 
 # -----------------------------------------------------------------------------
     def __abs__(self):
-        return Measure(abs(self._value), self._error, aproximate=False, units=self.units)
+        return Measure(abs(self._value), self._error, approximate=False, units=self.units)
 
 
     def __add__(self, other):
@@ -338,7 +338,7 @@ class Measure:
         self = self.convert(finalunits)
         other = other.convert(finalunits)
 
-        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False, units=finalunits)
+        return Measure(self._value + other._value, np.sqrt(self._error**2 + other._error**2), approximate = False, units=finalunits)
 
     def __radd__(self, other):
         return self + other
@@ -354,7 +354,7 @@ class Measure:
         self = self.convert(finalunits)
         other = other.convert(finalunits)
 
-        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), aproximate = False, units = finalunits)
+        return Measure(self._value - other._value, np.sqrt(self._error**2 + other._error**2), approximate = False, units = finalunits)
 
     def __rsub__(self, other):
         return -self + other
@@ -366,10 +366,10 @@ class Measure:
         error = np.sqrt(np.array( (other._value * self._error)**2 + (self._value * other._error)**2 ))
         units = self.units*other.units
 
-        return Measure(value, error, aproximate = False, units=units)
+        return Measure(value, error, approximate = False, units=units)
 
     def __rmul__(self, val):
-        return Measure(val * self._value, abs(val) * self._error, aproximate = False)
+        return Measure(val * self._value, abs(val) * self._error, approximate = False)
 
     def __truediv__(self, other):
         return self*other**-1
@@ -381,10 +381,10 @@ class Measure:
         value = self._value**other
         error = abs((other)*self._value**(other-1))*self._error
         units = self.units**other
-        return Measure(value, error, aproximate = False, units=units)
+        return Measure(value, error, approximate = False, units=units)
 
     def __and__(self, other):
-        return Measure(self._value + other._value, self._error + other._error, aproximate = False, units=self.units)
+        return Measure(self._value + other._value, self._error + other._error, approximate = False, units=self.units)
 
     def __or__(self, other):
         return self & -other
@@ -399,7 +399,7 @@ class Measure:
 
     def __getitem__(self, index):
         if not hasattr(index, '__getitem__'):
-            return Measure(self._value[index], self._error[index], aproximate=False)
+            return Measure(self._value[index], self._error[index], approximate=False)
 
         expected_index = index[0]
         value_o_error = index[1]
@@ -466,16 +466,16 @@ class Line:
     ordinate in the origin. It can be deconstructed as a tuple (slope, n_0)
     """
     def __init__(self, slope=0, n_0=0, x=[]):
-        self.slope = Measure(slope, aproximate = False)
-        self.n_0 = Measure(n_0, aproximate = False)
+        self.slope = Measure(slope, approximate = False)
+        self.n_0 = Measure(n_0, approximate = False)
         if not isinstance(x, Measure):
             self.x = Measure(x)
         else:
             self.x = x
 
-    def aprox(self):
-        self.slope.aprox()
-        self.n_0.aprox()
+    def approx(self):
+        self.slope.approx()
+        self.n_0.approx()
         return self
 
     def copy(self):
@@ -512,5 +512,5 @@ if __name__ == '__main__':
     print()
     m = Measure([353.72, 1532.6, 632], [2.56, 1, 1])
     print(f'm -> {m}')
-    m.cambia_estilo(Measure.Estilo.lista)
+    m.change_style(Measure.Style.list)
     print(m)

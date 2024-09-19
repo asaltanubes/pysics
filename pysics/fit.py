@@ -4,7 +4,7 @@ from scipy.optimize import curve_fit
 from inspect import signature
 
 
-def curve(function, x: list[float], y: list[float], sigma = None, initial_guess: list[float] | float | None = None, aproximate: bool = False):
+def curve(function, x: list[float], y: list[float], sigma = None, initial_guess: list[float] | float | None = None, approximate: bool = False):
     """
     Makes a fit to an arbitrary curve given by the function passed as a parameter.
     If no parameter is passed for sigma, the fit has no weights, if an iterable is passed, the values are taken as errors
@@ -29,7 +29,7 @@ def curve(function, x: list[float], y: list[float], sigma = None, initial_guess:
 
     popt, error = curve_fit(function, x, y, p0=initial_guess, sigma = sigma)
     # Returns a tuple with the Measures obtained
-    return tuple((Measure(v, e, aproximate=aproximate) for v, e in zip(popt, np.sqrt(np.diag(error)))))
+    return tuple((Measure(v, e, approximate=approximate) for v, e in zip(popt, np.sqrt(np.diag(error)))))
 
 def r_line(x: list[float], y: list[float]):
     x = np.array(x)
@@ -40,7 +40,7 @@ def r_line(x: list[float], y: list[float]):
     sigma_y = sum(des_y**2)
     return sum(des_x * des_y)/np.sqrt(sigma_x*sigma_y)
 
-def r_curve(function, x, y, sigma = None, initial_guess=None, aproximate = False) -> float:
+def r_curve(function, x, y, sigma = None, initial_guess=None, approximate = False) -> float:
     if isinstance(y, Measure):
         if hasattr(sigma, '__iter__'):
             sigma = y.error
@@ -60,7 +60,7 @@ def r_curve(function, x, y, sigma = None, initial_guess=None, aproximate = False
     ss_tot = np.sum((y-np.mean(y))**2)
     return np.sqrt(1 - (ss_res / ss_tot))
 
-def least_squares(x: list[float], y: list[float], aproximate: bool = False) -> Line:
+def least_squares(x: list[float], y: list[float], approximate: bool = False) -> Line:
     """
     Calculates the Line of adjustment by least squares for two Measures.
 
@@ -73,13 +73,13 @@ def least_squares(x: list[float], y: list[float], aproximate: bool = False) -> L
     dslope, dn_0 = sigma_calc_line(x, y)
     x_units  = x.units if isinstance(x, Measure) else Units()
     y_units = y.units if isinstance(y, Measure) else Units()
-    slope: Measure = Measure(slope, dslope, aproximate=aproximate, units=y_units/x_units)
-    n_0: Measure = Measure(n_0, dn_0, aproximate=aproximate, units=y_units)
+    slope: Measure = Measure(slope, dslope, approximate=approximate, units=y_units/x_units)
+    n_0: Measure = Measure(n_0, dn_0, approximate=approximate, units=y_units)
     if isinstance(x, Measure):
         x = x.value
     return Line(slope, n_0, x)
 
-def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, aproximate: bool = False) -> Line:
+def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, approximate: bool = False) -> Line:
     """
     Calculates the Line of adjustment by weighted least squares for two Measures.
     The error of the y axis is extracted from the Measure \"y\" and the error of the x axis is
@@ -97,8 +97,8 @@ def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, aproximate:
     dslope, dn_0 = wsigma_calc_line(x=x, y=y, yerr=yerr)
     x_units  = x.units if isinstance(x, Measure) else Units()
     y_units = y.units if isinstance(y, Measure) else Units()
-    slope: Measure = Measure(slope, dslope, aproximate=aproximate, units=x_units)
-    n_0: Measure = Measure(n_0, dn_0, aproximate=aproximate, units=y_units)
+    slope: Measure = Measure(slope, dslope, approximate=approximate, units=x_units)
+    n_0: Measure = Measure(n_0, dn_0, approximate=approximate, units=y_units)
     if isinstance(x, Measure):
         x = x.Measure
     return Line(slope, n_0, x)

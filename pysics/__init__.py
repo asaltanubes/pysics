@@ -4,14 +4,14 @@ from .constants import *
 from .units import *
 
 from . import fit
-from . import aprox
+from . import approx
 from . import reader
 from . import statistic
 from . import func
 from . import objects
 from . import plot
 from . import tables
-from . import calculos
+from . import round
 from . import constants
 from . import prelude
 from . import units

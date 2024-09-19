@@ -3,28 +3,28 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="pysics_lab"
-version="0.1.1"
+name = "pysics"
+version = "0.1.1"
 dependencies = [
-        "numpy>=2.0.1",
-        "scipy>=1.13.0",
-        "matplotlib>=3.8.4",
-        "tabulate>=0.9.0",
+    "numpy>=2.0.1",
+    "scipy>=1.13.0",
+    "matplotlib>=3.8.4",
+    "tabulate>=0.9.0",
 ]
 requires-python = ">=3.12"
 authors = [
-    {name="asaltanubes", email="gustavodragonico@gmail.com"},
-    {name="O2s0k0i3"}
+    { name = "asaltanubes", email = "gustavodragonico@gmail.com" },
+    { name = "O2s0k0i3", email = "elultimopekka@gmail.com" },
 ]
-description="Library to make laboratory calculations easy"
-readme="README.MD"
-license={file="APACHE 2.0"}
-keywords=["physics", "laboratory", "units", "least squares"]
+description = "Library to make laboratory calculations easy"
+readme = "README.MD"
+license = { file = "APACHE 2.0" }
+keywords = ["physics", "laboratory", "units", "least squares"]
 classifiers = [
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
 ]
 
 [project.urls]
-Repository="https://github.com/asaltanubes/pysics"
-Issues="https://github.com/asaltanubes/pysics/issues"
+Repository = "https://github.com/asaltanubes/pysics"
+Issues = "https://github.com/asaltanubes/pysics/issues"
