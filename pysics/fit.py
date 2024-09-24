@@ -97,10 +97,10 @@ def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, approximate
     dslope, dn_0 = wsigma_calc_line(x=x, y=y, yerr=yerr)
     x_units  = x.units if isinstance(x, Measure) else Unit()
     y_units = y.units if isinstance(y, Measure) else Unit()
-    slope: Measure = Measure(slope, dslope, approximate=approximate, units=x_units)
+    slope: Measure = Measure(slope, dslope, approximate=approximate, units=y_units/x_units)
     n_0: Measure = Measure(n_0, dn_0, approximate=approximate, units=y_units)
     if isinstance(x, Measure):
-        x = x.Measure
+        x = x._value
     return Line(slope, n_0, x)
 
 def line(x: list[float] , slope: float, n_0: float=0) -> list[float]:
@@ -246,7 +246,7 @@ def wslope(x: list[float], y: list[float], yerr: list[float] = None) -> float:
     if isinstance(y, Measure):
         if yerr == None:
             yerr = y._error
-    yerr = yerr if yerr.len() != 1 else yerr * np.ones(x.size)
+    yerr = yerr if len(yerr) != 1 else yerr * np.ones(x.size)
 
     x = np.array(x)
     y = np.array(y)
@@ -262,7 +262,7 @@ def wn_0(x: list[float], y: list[float], yerr: list[float] = None) -> float:
     if isinstance(y, Measure):
         if yerr == None:
             yerr = y._error
-    yerr = yerr if yerr.len() != 1 else yerr * np.ones(x.size)
+    yerr = yerr if len(yerr) != 1 else yerr * np.ones(x.size)
 
     x = np.array(x)
     y = np.array(y)
@@ -277,10 +277,10 @@ def wsigma_slope(x: list[float], y: list[float], yerr: list[float] = None) -> fl
     if isinstance(y, Measure):
         if yerr == None:
             yerr = y._error
-    yerr = yerr if yerr.len() != 1 else yerr * np.ones(x.size)
+    yerr = yerr if len(yerr) != 1 else yerr * np.ones(x.size)
 
-    x = np.arary(x)
-    y = np.arary(y)
+    x = np.array(x)
+    y = np.array(y)
 
     w = 1/yerr**2
 
@@ -291,7 +291,7 @@ def wsigma_n_0(x: list[float], y: list[float], yerr: list[float] = None) -> floa
     if isinstance(y, Measure):
         if yerr == None:
             yerr = y._error
-    yerr = yerr if yerr.len() != 1 else yerr * np.ones(x.size)
+    yerr = yerr if len(yerr) != 1 else yerr * np.ones(x.size)
 
     x = np.array(x)
     y = np.array(y)
