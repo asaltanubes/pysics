@@ -10,6 +10,7 @@ Pysics is a Python module designed to perform calculations typically done in phy
 6. [Func](#func)
 7. [Read](#read)
 8. [Tables](#tables)
+9. [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -406,3 +407,6 @@ print(typst_table)
 ```
 
 These functions provide flexible table formatting options for various output formats, making it easy to present data in the desired style for different applications.
+
+## Acknowledgements
+Special thanks to [Jonathan Dönszelmann](https://donsz.nl/) for the pypi project name
