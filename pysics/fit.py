@@ -1,4 +1,4 @@
-from .objects import Measure, Line
+from .objects import Measure, Line, Unit
 import numpy as np
 from scipy.optimize import curve_fit
 from inspect import signature
@@ -71,8 +71,8 @@ def least_squares(x: list[float], y: list[float], approximate: bool = False) -> 
     """
     slope, n_0 = calc_line(x, y)
     dslope, dn_0 = sigma_calc_line(x, y)
-    x_units  = x.units if isinstance(x, Measure) else Units()
-    y_units = y.units if isinstance(y, Measure) else Units()
+    x_units  = x.units if isinstance(x, Measure) else Unit()
+    y_units = y.units if isinstance(y, Measure) else Unit()
     slope: Measure = Measure(slope, dslope, approximate=approximate, units=y_units/x_units)
     n_0: Measure = Measure(n_0, dn_0, approximate=approximate, units=y_units)
     if isinstance(x, Measure):
@@ -95,8 +95,8 @@ def wleast_squares(x: Measure, y: Measure, yerr: list[float] = None, approximate
 
     slope, n_0 = wcalc_line(x=x, y=y, yerr=yerr)
     dslope, dn_0 = wsigma_calc_line(x=x, y=y, yerr=yerr)
-    x_units  = x.units if isinstance(x, Measure) else Units()
-    y_units = y.units if isinstance(y, Measure) else Units()
+    x_units  = x.units if isinstance(x, Measure) else Unit()
+    y_units = y.units if isinstance(y, Measure) else Unit()
     slope: Measure = Measure(slope, dslope, approximate=approximate, units=x_units)
     n_0: Measure = Measure(n_0, dn_0, approximate=approximate, units=y_units)
     if isinstance(x, Measure):
