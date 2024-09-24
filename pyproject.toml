@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysics"
-version = "0.1.1"
+version = "0.1.0"
 dependencies = [
     "numpy>=2.0.1",
     "scipy>=1.13.0",
