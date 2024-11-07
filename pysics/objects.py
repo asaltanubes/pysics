@@ -146,6 +146,70 @@ def _get_error(value, error):
                 error = [error]*len(value)
     return np.array([abs(i) for i in error])
 
+def _format_numbers(value: float, error: float) -> str:
+    """
+    If one of them is in sci not, convert both to sci not using as precision the number of decimals of the one with more decimals. If the exponents are similar (magic number), we print both of them with the same exponent, that being the biggest of the two if both are positive, or the lowest in other case (this is like this in order to not lose precision). We format the number like (value ± error)e(exponent).
+    """
+    # In case one of the numbers is not a float, I cast it into one. That doesn't affect
+    # the values in any way.
+    value, error = float(value), float(error)
+    value_str, error_str = str(value), str(error)
+
+    if 'e' in value_str or 'e' in error_str:
+        # If it is in scientific notation, replace 'e' with '.' in order to take only the decimals to compute the lenght
+        # I take the first two results which are what I'm interested in
+        value_int_part, value_decimal_part = value_str.replace("e", ".").split(".")[0:2]
+        error_int_part, error_decimal_part = error_str.replace("e", ".").split(".")[0:2]
+
+        value_digits = len(value_int_part.lstrip('0')) + len(value_decimal_part.rstrip('0')) - 1
+        error_digits = len(error_int_part.lstrip('0')) + len(error_decimal_part.rstrip('0')) - 1
+        # We want that both numbers are shown with the mayor precision we have.
+        decimals = max(value_digits, error_digits)
+
+        # numbers expressed in sci not with the same amount of decimals (the biggest of the two)
+        value_base, value_exp = f"{value:.{decimals}e}".split('e')
+        value_base, value_exp = float(value_base), int(value_exp)
+        error_base, error_exp = f"{error:.{decimals}e}".split('e')
+        error_base, error_exp = float(error_base), int(error_exp)
+
+        # If the exponents are close, we create a common exponent for both value and error, otherwise we show them separetly
+        # Not sure what magic number to put here
+        if abs(value_exp - error_exp) < 5:
+            # We use the maximum exponent to show both numbers in case both are positive, in other case we use the minimum.
+            # Maybe is best to use the error exponent directly ?
+            exponent = max(value_exp, error_exp) if value_exp > 0 and error_exp > 0 else min(value_exp, error_exp)
+
+            value_decimals = len(f"{value / (10 ** exponent):.{value_digits}f}".rstrip('0').split('.')[1])
+            error_decimals = len(f"{error / (10 ** exponent):.{error_digits}f}".rstrip('0').split('.')[1])
+
+            decimals = max(value_decimals, error_decimals)
+            value_base = f"{value / (10 ** exponent):.{decimals}f}"
+            error_base = f"{error / (10 ** exponent):.{decimals}f}"
+
+            return f"({value_base} ± {error_base})e{exponent}"
+
+        value_decimals = len(f"{value / (10 ** value_exp):.{value_digits}f}".rstrip('0').split('.')[1])
+        error_decimals = len(f"{error / (10 ** error_exp):.{error_digits}f}".rstrip('0').split('.')[1])
+
+        decimals = max(value_decimals, error_decimals)
+
+        # Because the exponents are too diferent at this point, if the exponent of either
+        # the value or the error is less than a magic number again, it prints the number
+        # without sci not.
+        value_number = f"{value_base:.{decimals}f}e{value_exp}"
+        error_number = f"{error_base:.{decimals}f}e{error_exp}"
+        value_number = float(value_number) if abs(value_exp) < 4 else value_number
+        error_number = float(error_number) if abs(error_exp) < 4 else error_number
+
+        return f"{value_number} ± {error_number}"
+
+    value_decimals = len(value_str.rstrip('0').split('.')[1])
+    error_decimals = len(error_str.rstrip('0').split('.')[1])
+
+    decimals = max(value_decimals, error_decimals)
+
+    return f"{value:.{decimals}f} ± {error:.{decimals}f}"
+
 class Measure:
     """
     Basic object to store values. It can be given one or several values
@@ -279,11 +343,18 @@ class Measure:
                 e = [str(i) for i in self._error]
             return f'{v} ± {e} {self.units.symbol}'
 
-        def pm(self):
+        def pm_raw(self):
             """value 1 ± error 1, value 2 ± error 2, ..."""
             l = []
             for v, e in zip(self._value, self._error):
                 l.append(f'{v} ± {e}')
+            return ', '.join(l) + f" {self.units.symbol}"
+
+        def pm(self):
+            """value 1 ± error 1, value 2 ± error 2, ..."""
+            l = []
+            for v, e in zip(self._value, self._error):
+                l.append(_format_numbers(v, e))
             return ', '.join(l) + f" {self.units.symbol}"
 
         def a(self):
