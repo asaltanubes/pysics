@@ -188,8 +188,11 @@ def _format_numbers(value: float, error: float) -> str:
 
             return f"({value_base} ± {error_base})e{exponent}"
 
-        value_decimals = len(f"{value / (10 ** value_exp):.{value_digits}f}".rstrip('0').split('.')[1])
-        error_decimals = len(f"{error / (10 ** error_exp):.{error_digits}f}".rstrip('0').split('.')[1])
+        value_parts = f"{value / (10 ** value_exp):.{value_digits}f}".rstrip('0').split('.')
+        error_parts = f"{error / (10 ** error_exp):.{error_digits}f}".rstrip('0').split('.')
+
+        value_decimals = 0 if len(value_parts) != 2 else len(value_parts[1])
+        error_decimals = 0 if len(error_parts) != 2 else len(error_parts[1])
 
         decimals = max(value_decimals, error_decimals)
 
